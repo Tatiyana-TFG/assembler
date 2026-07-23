@@ -163,8 +163,6 @@ int macro_expand(const char *src, const char *dst) {
                         printf("Error: ")
                     }
 
-                    strcpy(table[macro_count].body[table[macro_count].line_count],line);
-                    table[macro_count].line_count ++;
                 }
             }
             macro_count++; /*proceed to next macro*/        
