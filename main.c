@@ -1,21 +1,31 @@
 #include <stdio.h>
 #include <string.h>
+#include "macro.h"
 #include "datatypes.h"
 
 int main(int argc, char *argv[]) {
     char src[256], am[256];
     int IC = 100; /* instruction counter starts at 100 per spec */
     int DC = 0;   /* data counter starts at 0 */
+    int i;
 
     if (argc < 2) {
         printf("Proper command is this: assembler <filename>\n");
         return 1;
     }
-
-    sprintf(src, "%s.as", argv[1]);  /* src = "prog.as" */
-    sprintf(am,  "%s.am", argv[1]);  /* am  = "prog.am" */
-    macro_expand(src, am);
     
+    for (i = 1; i < argc; i++) {
+        sprintf(src, "%s.as", argv[i]);  /* src = "prog.as" */
+        sprintf(am,  "%s.am", argv[i]);  /* am  = "prog.am" */
+        if (macro_expand(src, am) != 0){ /* send src and pointer to dst */
+            continue;
+        }
+        
+    }
+
+  
+
+
         /* TODO: classify line and dispatch */
         /* line_type type = classify_line(line);
            switch (type) {
@@ -29,7 +39,7 @@ int main(int argc, char *argv[]) {
                    DC += parse_directive(line);
                    break;
            } */
-    
+
 
     return 0;
 }
