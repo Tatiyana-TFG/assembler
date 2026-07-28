@@ -4,13 +4,15 @@
 #include "datatypes.h"
 #include "macro_helpers.h"
 
-int first_pass(char *am, Macro *mcro_head);
+int first_pass(char *am, Macro *mcro_head, int IC,int DC, int *inst_image, int *data_image);
 
 int main(int argc, char *argv[]) {
     char src[256], am[256]; /* maybe should also be dynamic */
     int IC = 100; /* instruction counter starts at 100 per spec */
     int DC = 0;   /* data counter starts at 0 */
-    int i; /* whats this now ? */
+    int i;
+    int data_image[1000];
+    int inst_image[1000];
 
     if (argc < 2) {
         printf("Proper command is this: assembler <filename>\n"); /* */
@@ -24,7 +26,7 @@ int main(int argc, char *argv[]) {
         if (macro_expand(src, am, &mcro_head) != 0){ /* send src and pointer to dst */
             continue;
         }
-    if (first_pass(am,mcro_head)!= 0){
+    if (first_pass(am,mcro_head,IC,DC, &inst_image, &data_image)!= 0){
         free_macros(mcro_head);
         printf("Error:first pass input errors occured\n");
         continue; /* got errors in first pass, continue to next file*/

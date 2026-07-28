@@ -1,12 +1,12 @@
 #include "datatypes.h"
-#include "classifier_helper.h"
+#include "first_pass_helper.h"
 #include "classifier.h"
 #include <stdlib.h> 
 #include <string.h>
 #include <stdio.h>
 
 
-int first_pass(char *am,Macro *mcro_head) {
+int first_pass(char *am,Macro *mcro_head,int IC,int DC, int *inst_image, int *data_image) {
 int line_num=0;
 char line[MAX_LINE];
 line_type type;
@@ -45,7 +45,10 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                case LINE_INSTRUCTION:
                if (has_label){
-                    add_symbol(&symbols, label_name, IC,1,0,0,0);
+                    if(add_symbol(&symbols,label_name, IC,1,0,0,0)==0){
+                        error_flag++;
+                        break;
+                    }
                }
                 /* encode
                 code[ic]= encoded;*/
@@ -55,7 +58,6 @@ while (fgets(line,MAX_LINE,in) != NULL){
                case LINE_DIRECTIVE:
                 if (has_label){
                     if(add_symbol(&symbols,label_name, DC,0,1,0,0)==0){
-                        printf("Error: cannot allocate space\n");
                         error_flag++;
                         break;
                     }

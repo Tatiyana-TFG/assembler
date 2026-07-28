@@ -1,6 +1,6 @@
 #include "datatypes.h"
 #include "macro.h"
-#include "classifier_helper.h"
+#include "first_pass_helper.h"
 #include <stdlib.h> 
 #include <string.h>
 
@@ -53,4 +53,3 @@ line_type classify_line(char *line)
       
     }
   }
-}
