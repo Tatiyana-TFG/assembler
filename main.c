@@ -4,15 +4,15 @@
 #include "datatypes.h"
 
 int main(int argc, char *argv[]) {
-    char src[256], am[256];
+    char src[256], am[256]; /* maybe should also be dynamic */
     int IC = 100; /* instruction counter starts at 100 per spec */
     int DC = 0;   /* data counter starts at 0 */
-    int i;
+    int i; /* whats this now ? */
 
     if (argc < 2) {
-        printf("Proper command is this: assembler <filename>\n");
+        printf("Proper command is this: assembler <filename>\n"); /* */
         return 1;
-    }
+    } 
     
     for (i = 1; i < argc; i++) {
         sprintf(src, "%s.as", argv[i]);  /* src = "prog.as" */
@@ -22,13 +22,12 @@ int main(int argc, char *argv[]) {
         }
         
     }
+    first_pass(am);
+   /*
 
-  
+ line_type type = classify_line(line){
 
-
-        /* TODO: classify line and dispatch */
-        /* line_type type = classify_line(line);
-           switch (type) {
+       switch (type) 
                case LINE_EMPTY:
                case LINE_COMMENT:
                    break;
@@ -38,8 +37,12 @@ int main(int argc, char *argv[]) {
                case LINE_DIRECTIVE:
                    DC += parse_directive(line);
                    break;
-           } */
+                
+                    return 0;
+
+           }
+     
+       */
 
 
-    return 0;
 }
