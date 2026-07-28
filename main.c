@@ -2,6 +2,9 @@
 #include <string.h>
 #include "macro.h"
 #include "datatypes.h"
+#include "macro_helpers.h"
+
+int first_pass(char *am, Macro *mcro_head);
 
 int main(int argc, char *argv[]) {
     char src[256], am[256]; /* maybe should also be dynamic */
@@ -15,14 +18,20 @@ int main(int argc, char *argv[]) {
     } 
     
     for (i = 1; i < argc; i++) {
+        Macro *mcro_head = NULL;
         sprintf(src, "%s.as", argv[i]);  /* src = "prog.as" */
         sprintf(am,  "%s.am", argv[i]);  /* am  = "prog.am" */
-        if (macro_expand(src, am) != 0){ /* send src and pointer to dst */
+        if (macro_expand(src, am, &mcro_head) != 0){ /* send src and pointer to dst */
             continue;
         }
-        
+    if (first_pass(am,mcro_head)!= 0){
+        free_macros(mcro_head);
+        printf("Error:first pass input errors occured\n");
+        continue; /* got errors in first pass, continue to next file*/
     }
-    first_pass(am);
+        
+    free_macros(mcro_head);
+    }
    /*
 
  line_type type = classify_line(line){

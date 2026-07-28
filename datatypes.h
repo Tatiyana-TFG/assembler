@@ -5,8 +5,8 @@
 
 typedef struct Symbol {
     char name[MAX_LINE];
-    char value[MAX_LINE];
-    char attribute [MAX_LINE];
+    int value;
+    int attribute;
     struct Symbol *next;
 } Symbol;
 
@@ -32,8 +32,14 @@ typedef struct Symbol_table {
 
 typedef enum 
 { 
-    LINE_EMPTY, LINE_COMMENT, LINE_INSTRUCTION, LINE_DIRECTIVE
+    IS_DATA, IS_CODE, IS_ENTRY, IS_EXTERNAL, IS_DATA_ENTRY, IS_DATA_EXTERNAL
 } 
-    line_type; /* how does the parser check this? */
+    attribue; 
+
+    typedef enum 
+{ 
+    LINE_EMPTY, LINE_COMMENT, LINE_INSTRUCTION, LINE_DIRECTIVE
+}
+    line_type; 
 
 #endif

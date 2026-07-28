@@ -13,7 +13,7 @@ int line_too_long(const char *line, FILE *fp) {
     return 0;
 }
    
-int find_macro(Macro *head, char *name){                                                                                                                          
+int find_macro(Macro *head, char *name){ /* if found return 1 if not return 0*/                                                                                                                     
         Macro *p = head;                                                                                                       
         while (p != NULL) {                                                                                                    
             if (strcmp(p->name, name) == 0)                                                                                    
@@ -77,7 +77,7 @@ void print_macro(Macro *mcro, FILE *out){
       }
   }
   
-int is_reserved(char *name) 
+int is_reserved(char *name) /* 0 if not reserved 1 if reserved*/
 {
     static const char * forbiden_names[] = {
         "add", "sub", "and", "or", "nor",

@@ -4,7 +4,7 @@
   #include "macro_helpers.h"
   #include "macro.h"
 
-int macro_expand(const char *src, const char *dst) {
+int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
     char tmp[MAX_LINE];
     char *token;
     int line_num = 0;
@@ -135,6 +135,6 @@ int macro_expand(const char *src, const char *dst) {
 
     fclose(in);
     fclose(out);
-    free_macros(mcro);
+    *mcro_head=mcro;
     return 0;
 }
