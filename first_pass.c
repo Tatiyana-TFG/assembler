@@ -15,7 +15,9 @@ int has_label;
 char *p;
 char label_name[MAX_NAME];
 int error_flag =0;
-Symbol *symbol_head = NULL;
+Symbol_table symbols;
+symbols.head=NULL;
+symbols.tail=NULL;
 
 /* open am file for reading after macro expension*/
 in = fopen(am,"r");
@@ -42,19 +44,30 @@ while (fgets(line,MAX_LINE,in) != NULL){
                    continue;
 
                case LINE_INSTRUCTION:
-               if (!has_label){
+               if (has_label){
+                    add_symbol(&symbols, label_name, IC,1,0,0,0);
+               }
+                /* encode
+                code[ic]= encoded;*/
+                /* ic +4 */
+                continue;
 
-               } else {} 
-               /*encode add to instruction image */
-                   continue;
                case LINE_DIRECTIVE:
-                if (!has_label){
-                
-               } else {}
-                   /* is it data or entry/extern?*/
-                   break;
+                if (has_label){
+                    if(add_symbol(&symbols,label_name, DC,0,1,0,0)==0){
+                        printf("Error: cannot allocate space\n");
+                        error_flag++;
+                        break;
+                    }
                 }
+                /*encode
+                data[dc] = encoded;
+                dc +=
+                */
+                continue;
+                
 }
+
 fclose(in);
 if (error_flag) return -1;
 else {

@@ -34,9 +34,20 @@ if (!is_reserved(name)){
 
 
 
-int add_symbol(char *name, Symbol *head) {
-    /* 1 for success 0 for faliure adding */
-    find_symbol();
+int add_symbol(Symbol_table *table,char * name, int value, int code, int dat, int ent, int ext) {
+
+    Symbol *curr = malloc(sizeof(Symbol));
+    if (!curr) return 0;
+    strcpy(curr->name,name);
+    curr->value=value;
+    curr->is_code = code;
+    curr->is_dat = dat;
+    curr->is_ent = ent;
+    curr->is_ext = ext;
+    *head = curr;
+    return 1;
+}
+int find_symbol(char *name, Symbol **head);
 
 
 }
