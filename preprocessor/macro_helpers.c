@@ -3,18 +3,6 @@
 #include <stdlib.h> 
 #include "macro_helpers.h"
 
-static const char * forbiden_names[] = { 
-    "add", "sub", "and", "or", "nor",
-      "move", "mvhi", "mvlo",
-      "addi", "subi", "andi", "ori", "nori",
-      "bne", "beq", "blt", "bgt",
-      "lb", "sb", "lw", "sw", "lh", "sh",
-      "jmp", "la", "call", "hlt",
-      ".db", ".dw", ".dh", ".asciz", ".entry", ".extern",
-      "mcro", "mcroend",
-      NULL};
-      
-
 int line_too_long(const char *line, FILE *fp) {
     int c;
     if (strchr(line, '\n') == NULL && !feof(fp)) 
@@ -91,6 +79,17 @@ void print_macro(Macro *mcro, FILE *out){
   
 int is_reserved(char *name) 
 {
+    static const char * forbiden_names[] = {
+        "add", "sub", "and", "or", "nor",
+        "move", "mvhi", "mvlo",
+        "addi", "subi", "andi", "ori", "nori",
+        "bne", "beq", "blt", "bgt",
+        "lb", "sb", "lw", "sw", "lh", "sh",
+        "jmp", "la", "call", "hlt",
+        ".db", ".dw", ".dh", ".asciz", ".entry", ".extern",
+        "mcro", "mcroend",
+        NULL};
+      
 const char **p;
 
     for (p = forbiden_names ; *p != NULL; p++) { /*check if macro name is in the forbidden name array*/ 
