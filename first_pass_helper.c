@@ -25,9 +25,11 @@ if (!is_reserved(name)){
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext) { /*success added on 1*/
     if (find_symbol(table,name) == 0){
         Symbol *curr = malloc(sizeof(Symbol));
-        if (!curr) 
+        if (!curr){ 
             printf("Error: cannot allocate space for '%s',\n",name);
             return 0;
+        } 
+           
         strcpy(curr->name,name);
         curr->value=value;
         curr->is_code = code;
