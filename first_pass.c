@@ -5,19 +5,18 @@
 #include <string.h>
 #include <stdio.h>
 
-
-int first_pass(char *am,Macro *mcro_head,int IC,int DC, int *inst_image, int *data_image) {
+int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
 int line_num=0;
 char line[MAX_LINE];
 line_type type;
+directive_type dt;
 FILE *in;
 int has_label;
 char *p;
+char op[MAX_NAME];
 char label_name[MAX_NAME];
 int error_flag =0;
-Symbol_table symbols;
-symbols.head=NULL;
-symbols.tail=NULL;
+
 
 /* open am file for reading after macro expension*/
 in = fopen(am,"r");
@@ -37,44 +36,57 @@ while (fgets(line,MAX_LINE,in) != NULL){
     }
     
     type = classify_line(p); 
-        switch (type) {/* check for a lable */
+        switch (type) {/* what kind of line? */
 
                case LINE_EMPTY:
                case LINE_COMMENT:
-                   continue;
+               continue;
 
                case LINE_INSTRUCTION:
                if (has_label){
-                    if(add_symbol(&symbols,label_name, IC,1,0,0,0)==0){
-                        error_flag++;
-                        break;
+                    if(add_symbol(symbols,label_name, *IC,1,0,0,0)==0){
+                        error_flag++; continue;
                     }
-               }
-                /* encode
-                code[ic]= encoded;*/
-                /* ic +4 */
-                continue;
+               } /* encode code[ic]= encoded;*/ /* ic +4 */ continue;
 
                case LINE_DIRECTIVE:
-                if (has_label){
-                    if(add_symbol(&symbols,label_name, DC,0,1,0,0)==0){
-                        error_flag++;
-                        break;
-                    }
-                }
-                /*encode
-                data[dc] = encoded;
-                dc +=
-                */
+               dt = classify_dir(p);
+               switch (dt){
+                case EXTERN:
+                if (get_operand(p,op)){
+                    if(add_symbol(externs,op, 0,0,0,0,1)==0){
+                        error_flag++; continue;
+                    } continue;
+                }printf("Error: opernad name not leagl\n");
+                error_flag++; continue;
+            
+                case ENTRY:
+                if (get_operand(p,op)){
+                    if(add_symbol(entry,op, 0,0,0,1,0)==0){
+                        error_flag++; continue;
+                    } continue;
+                } printf("Error: opernad name not leagl\n");
+                error_flag++;
                 continue;
-                
-}
 
+                case DATA:
+                case STRING:
+                if (has_label) {
+                if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
+                error_flag++; continue;
+                }
+            } /* encode the values into data_image[*DC ...]; *DC += count; */
+            continue;         
+
+            case BAD_DIR:
+            printf("Error: unknown line directive in line %d\n", line_num);
+            error_flag ++;
+            continue;
+            }/*dt switch*/     
+    }/*type switch*/
+}/*while loop*/
 fclose(in);
 if (error_flag) return -1;
-else {
-    return 0;
+return 0;
+}/*funct*/
 
-}
-
-}

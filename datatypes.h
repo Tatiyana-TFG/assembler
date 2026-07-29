@@ -40,4 +40,11 @@ typedef enum
 }
     line_type; 
 
+
+typedef enum 
+{ 
+    EXTERN, ENTRY, DATA, STRING, BAD_DIR
+}
+    directive_type; 
+
 #endif

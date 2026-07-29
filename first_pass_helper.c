@@ -22,7 +22,7 @@ if (!is_reserved(name)){
     } return 0;
 }
 
-int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext) { /*success added on 1*/
+int add_symbol(Symbol_table *table,char *name, int *value, int code, int dat, int ent, int ext) { /*success added on 1*/
     if (find_symbol(table,name) == 0){
         Symbol *curr = malloc(sizeof(Symbol));
         if (!curr){ 
@@ -58,18 +58,15 @@ int find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
         return 0;
     } 
 
-
-
-    
-
+int get_operand(char *p, char *op) {
+char *tok;
+strtok(p, " \t \n");
+tok = strtok(NULL," \t \n");
+if (!tok) return 0;
+strcpy(op,tok);
+return 1;
+}
 
 /*
-add_extern(){
-    add_symbol(extern with att 0);
-};
-add_entry(){
-    find_symbol(entry);
-    add_attribute( add the entry att to the found symbol);
-};
 free_symbol(){};
 */

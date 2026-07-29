@@ -4,10 +4,7 @@
 #include <stdlib.h> 
 #include <string.h>
 
-int valid_label(char *name, Macro *mcro);
-line_type classify_line(char *line);
-void save_DC(void);
-void save_IC(void);
+
 
 int is_label(char **line, char *name, Macro *mcro){
   int len;
@@ -38,18 +35,20 @@ int is_label(char **line, char *name, Macro *mcro){
   return 0; /* : exists but no label */
 }
 
-  
-
-
-line_type classify_line(char *line) 
-{
-  while (fgets(line,MAX_LINE) != NULL){
-        while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
-
-      if (*line == '\0' || *line == '\n') return LINE_EMPTY;
-      if (*line == ';')                   return LINE_COMMENT;
-      if (*line == '.')  return LINE_DIRECTIVE;
-      return LINE_INSTRUCTION;
+line_type classify_line(char *line){
+  while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
+  if (*line == '\0' || *line == '\n') return LINE_EMPTY;
+  if (*line == ';') return LINE_COMMENT;
+  if (*line == '.')  return LINE_DIRECTIVE;
+  return LINE_INSTRUCTION;
       
     }
-  }
+
+directive_type classify_dir (char *line){
+  while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
+  if (strncmp(line, ".extern", 7) == 0) return EXTERN;
+  if (strncmp(line, ".entry",  6) == 0) return ENTRY;
+  if (strncmp(line, ".db", 3) == 0 || strncmp(line, ".dh", 3) == 0 || strncmp(line, ".dw", 3) == 0)     return DATA;
+  if (strncmp(line, ".asciz", 6) == 0)  return STRING;
+  return BAD_DIR;
+}

@@ -4,7 +4,7 @@
 #include "datatypes.h"
 #include "macro_helpers.h"
 
-int first_pass(char *am, Macro *mcro_head, int IC,int DC, int *inst_image, int *data_image);
+int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry);
 
 int main(int argc, char *argv[]) {
     char src[256], am[256]; /* maybe should also be dynamic */
@@ -13,6 +13,12 @@ int main(int argc, char *argv[]) {
     int i;
     int data_image[1000];
     int inst_image[1000];
+    Symbol_table symbols;
+    Symbol_table externs;
+    Symbol_table entry;
+    Symbol_table symbols = { NULL, NULL };   /* head, tail */
+    Symbol_table externs = { NULL, NULL };
+    Symbol_table entry = { NULL, NULL };
 
     if (argc < 2) {
         printf("Proper command is this: assembler <filename>\n"); /* */
@@ -26,7 +32,7 @@ int main(int argc, char *argv[]) {
         if (macro_expand(src, am, &mcro_head) != 0){ /* send src and pointer to dst */
             continue;
         }
-    if (first_pass(am,mcro_head,IC,DC, &inst_image, &data_image)!= 0){
+    if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols,&externs,&entry)!= 0){
         free_macros(mcro_head);
         printf("Error:first pass input errors occured\n");
         continue; /* got errors in first pass, continue to next file*/
