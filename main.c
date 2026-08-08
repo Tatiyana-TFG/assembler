@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include "macro.h"
 #include "datatypes.h"
+#include "macro.h"
 #include "macro_helpers.h"
 
 int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry);
@@ -13,7 +13,6 @@ int main(int argc, char *argv[]) {
     int i;
     int data_image[1000];
     int inst_image[1000];
-    Symbol_table symbols;
     Symbol_table externs;
     Symbol_table entry;
     Symbol_table symbols = { NULL, NULL };   /* head, tail */

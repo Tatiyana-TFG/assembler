@@ -19,6 +19,12 @@ typedef struct Symbol_table {
     Symbol *tail;
 } Symbol_table;
 
+typedef struct Operation {
+    char name[MAX_LINE];
+    int opcode;
+    int funct;
+    int foramt;
+} Operation;
 
 typedef struct Line {
       char text[MAX_LINE];
