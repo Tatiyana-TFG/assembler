@@ -23,8 +23,19 @@ typedef struct Operation {
     char name[MAX_LINE];
     int opcode;
     int funct;
-    int foramt;
+    char foramt;
+    Operands operands_type;
 } Operation;
+
+typedef enum Operands{
+    THREE_REG,
+    TWO_REG,
+    REG_NUMBER_REG,
+    TWO_REGS_LABEL,
+    LABEL_OR_REG,
+    LABEL_ONLY,
+    NO_OPERANDS
+} Operands;
 
 typedef struct Line {
       char text[MAX_LINE];
@@ -37,7 +48,6 @@ typedef struct Macro {
       Line *tail;
       struct Macro *next;
   } Macro;
-
 
 
 typedef enum 

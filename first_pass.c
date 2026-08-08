@@ -16,7 +16,7 @@ char *p;
 char op[MAX_NAME];
 char label_name[MAX_NAME];
 int error_flag =0;
-
+const Operation *operation;
 
 /* open am file for reading after macro expension*/
 in = fopen(am,"r");
@@ -34,7 +34,6 @@ while (fgets(line,MAX_LINE,in) != NULL){
         error_flag ++;
         continue;
     }
-    
     type = classify_line(p); 
         switch (type) {/* what kind of line? */
 
@@ -43,18 +42,27 @@ while (fgets(line,MAX_LINE,in) != NULL){
                continue;
 
                case LINE_INSTRUCTION:
-               if (has_label){
+               if (has_label){ /*-1 case handled in line 32*/
                     if(add_symbol(symbols,label_name, *IC,1,0,0,0)==0){
-                        error_flag++; continue;
+                        error_flag++; continue; /* need to add error print?*/
                     }
-               } /* encode code[ic]= encoded;*/ /* ic +4 */ continue;
+               }
+               operation = find_op(p);
+               if (operation = NULL){
+                printf("Error: unknown operation in line %d\n",line_num);
+                error_flag++;
+                continue;
+               }
+               switch (operation) {
+                
+               }
 
                case LINE_DIRECTIVE:
                dt = classify_dir(p);
                switch (dt){
                 case EXTERN:
                 if (get_operand(p,op)){
-                    if(add_symbol(externs,op, 0,0,0,0,1)==0){
+                    if(add_symbol(externs,op, 0,0,0,0,1)==0){ /* need to add error print?*/
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");

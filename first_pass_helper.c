@@ -6,51 +6,55 @@
 
 
 static const Operation operation_info[] = {
-      /* R format */
-      {"add",   0,  1, 'R'},
-      {"sub",   0,  2, 'R'},
-      {"and",   0,  3, 'R'},
-      {"or",    0,  4, 'R'},
-      {"nor",   0,  5, 'R'},
-      {"move",  1,  1, 'R'},
-      {"mvhi",  1,  2, 'R'},
-      {"mvlo",  1,  3, 'R'},
+/* R: register, register, register */
+    {"add",   0,  1, 'R', THREE_REG},
+    {"sub",   0,  2, 'R', THREE_REG},
+    {"and",   0,  3, 'R', THREE_REG},
+    {"or",    0,  4, 'R', THREE_REG},
+    {"nor",   0,  5, 'R', THREE_REG},
 
-      /* I format */
-      {"addi", 10, -1, 'I'},
-      {"subi", 11, -1, 'I'},
-      {"andi", 12, -1, 'I'},
-      {"ori",  13, -1, 'I'},
-      {"nori", 14, -1, 'I'},
-      {"bne",  15, -1, 'I'},
-      {"beq",  16, -1, 'I'},
-      {"blt",  17, -1, 'I'},
-      {"bgt",  18, -1, 'I'},
-      {"lb",   19, -1, 'I'},
-      {"sb",   20, -1, 'I'},
-      {"lw",   21, -1, 'I'},
-      {"sw",   22, -1, 'I'},
-      {"lh",   23, -1, 'I'},
-      {"sh",   24, -1, 'I'},
+    /* R: register, register */
+    {"move",  1,  1, 'R', TWO_REG},
+    {"mvhi",  1,  2, 'R', TWO_REG},
+    {"mvlo",  1,  3, 'R', TWO_REG},
 
-      /* J format */
-      {"jmp",  30, -1, 'J'},
-      {"la",   31, -1, 'J'},
-      {"call", 32, -1, 'J'},
-      {"hlt",  63, -1, 'J'}
+    /* I: register, number, register */
+    {"addi", 10, -1, 'I', REG_NUMBER_REG},
+    {"subi", 11, -1, 'I', REG_NUMBER_REG},
+    {"andi", 12, -1, 'I', REG_NUMBER_REG},
+    {"ori",  13, -1, 'I', REG_NUMBER_REG},
+    {"nori", 14, -1, 'I', REG_NUMBER_REG},
+
+    /* I: register, register, label */
+    {"bne",  15, -1, 'I', TWO_REGS_LABEL},
+    {"beq",  16, -1, 'I', TWO_REGS_LABEL},
+    {"blt",  17, -1, 'I', TWO_REGS_LABEL},
+    {"bgt",  18, -1, 'I', TWO_REGS_LABEL},
+
+    /* I: register, number, register */
+    {"lb",   19, -1, 'I', REG_NUMBER_REG},
+    {"sb",   20, -1, 'I', REG_NUMBER_REG},
+    {"lw",   21, -1, 'I', REG_NUMBER_REG},
+    {"sw",   22, -1, 'I', REG_NUMBER_REG},
+    {"lh",   23, -1, 'I', REG_NUMBER_REG},
+    {"sh",   24, -1, 'I', REG_NUMBER_REG},
+
+      /* J formats */
+    {"jmp",  30, -1, 'J', LABEL_OR_REG},
+    {"la",   31, -1, 'J', LABEL_ONLY},
+    {"call", 32, -1, 'J', LABEL_ONLY},
+    {"hlt",  63, -1, 'J', NO_OPERANDS}
   };
 
-
-const Operation *find_op(char *line){
+const Operation *find_op(char **line){
     char *p = line;
     int i;
     char *tok;
-    char line_copy[MAX_LINE];
     int const op_elements = NUMBER_OF_OP_ELEMENTS; 
     /* skip whitespaces*/
     while (*p== ' ' || *p== '\t') p++;
-    strcpy (line_copy,p);
-    tok = strtok(line_copy,"\t \n"); /* get the operatation name into token and compare in while loop*/
+    tok = strtok(p,"\t \n"); /* get the operatation name into token and compare in while loop*/
+    *line = p;
     if (tok == NULL)
         return NULL;
     for (i=0; i < op_elements; i++){
