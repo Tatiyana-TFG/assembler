@@ -47,16 +47,20 @@ static const Operation operation_info[] = {
   };
 
 const Operation *find_op(char **line){
-    char *p = line;
+    char *p = *line;
     int i;
     char *tok;
     int const op_elements = NUMBER_OF_OP_ELEMENTS; 
+    char *line_end = p + strlen(p);
     /* skip whitespaces*/
     while (*p== ' ' || *p== '\t') p++;
     tok = strtok(p,"\t \n"); /* get the operatation name into token and compare in while loop*/
-    *line = p;
     if (tok == NULL)
         return NULL;
+    p = tok + strlen(tok); /* go past the operation name*/ 
+    if (p < line_end) /*move past the /0 added by the strtok only if delimiter exists*/
+        p++;  
+    *line = p;/*move pointer from caller function*/
     for (i=0; i < op_elements; i++){
         if (strcmp(tok,operation_info[i].name)==0){ /* find the array element with the operation name*/
             return &operation_info[i]; 
