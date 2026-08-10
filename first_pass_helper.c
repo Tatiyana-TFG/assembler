@@ -215,10 +215,19 @@ int read_imd (char **p, int *num, int line_num){
 
     *num = value;
     return 1;
-    
+
 }
 
-int read_label(char **p, char *label,int line_num){}
+int read_label(char **p, char *label,int line_num, Macro *mcro){
+skip_whitespaces(&p);
+if (!valid_label(label,mcro))
+    printf("Error: invalid label name in line %d \n", line_num);
+    return -1;
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
 
 int parse_three_regs(char *p, int *rs, int *rt, int *rd, int line_num){
 /*skip whitespaces -> check reg (including $ and valid number) -> skipws before and after comma -> check comma -> read register ...*/
@@ -303,13 +312,13 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_label_or_reg(char *p, int *rs, char *label, int line_num){
+int parse_label_or_reg(char *p, int *rs, char *label, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
 if (*p == '$') {
     if (!(read_reg(&p,rs,line_num)))
         return 0;
 } else 
-    if(!(read_label(&p,label,line_num))){
+    if(!(read_label(&p,label,line_num, mcro))){
         return 0;
 }
 skip_whitespaces(&p);
@@ -318,9 +327,9 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_label(char *p, char *label, int line_num){
+int parse_label(char *p, char *label, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
-if (!read_label(&p,label,line_num))
+if (!read_label(&p,label,line_num, mcro))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
