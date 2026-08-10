@@ -187,7 +187,36 @@ int value = 0;
 
 }
 
-int read_imd (char **p, int *num, int line_num){}
+int read_imd (char **p, int *num, int line_num){
+    int sign = 1;
+    int value = 0;
+
+    if (**p == '-'){ /* sign exists go past it*/
+        sign = -1;
+        (*p)++;
+    }
+    if (**p == '+') /* sign exists go past it*/
+        (*p)++;
+
+    if ( **p <'0' || **p >9){ /*check num is digit*/
+        printf("Error: Invalid immed in line %d \n", line_num);
+        return 0;
+    }
+
+    while (**p >= '0' && **p <=9){
+        value = value *10 + (**p - '0'); /* get the int number*/
+        (*p)++;
+    }
+
+    value *= sign; /*apply sign*/
+
+    if (value < -32768 || value > 32767)
+        return 0; /*check 16 bit range*/
+
+    *num = value;
+    return 1;
+    
+}
 
 int read_label(char **p, char *label,int line_num){}
 
