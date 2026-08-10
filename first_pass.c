@@ -12,6 +12,7 @@ line_type type;
 directive_type dt;
 FILE *in;
 int has_label;
+int rs,rt,rd;
 char *p;
 char op[MAX_NAME];
 char label_name[MAX_NAME];
@@ -53,8 +54,16 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 error_flag++;
                 continue;
                }
-               switch (operation) {
-                
+               switch (operation->operands_type) {
+                case THREE_REG:
+                parse_three_reg(p, &rs, &rt,&rd);
+                case TWO_REG:
+                case REG_NUMBER_REG:
+                case TWO_REGS_LABEL:
+                case LABEL_OR_REG:
+                case LABEL_ONLY:
+                case NO_OPERANDS:
+
                }
 
                case LINE_DIRECTIVE:

@@ -58,12 +58,12 @@ const Operation *find_op(char **line){
     if (tok == NULL)
         return NULL;
     p = tok + strlen(tok); /* go past the operation name*/ 
-    if (p < line_end) /*move past the /0 added by the strtok only if delimiter exists*/
+    if (p < line_end) /*move past the \0 added by the strtok only if delimiter exists*/
         p++;  
     *line = p;/*move pointer from caller function*/
     for (i=0; i < op_elements; i++){
         if (strcmp(tok,operation_info[i].name)==0){ /* find the array element with the operation name*/
-            return &operation_info[i]; 
+            return &operation_info[i]; /*returns the array element*/
         }
     }   return NULL; /* return null pointer if dosent exist*/
 
@@ -129,13 +129,62 @@ strcpy(op,tok);
 return 1;
 }
 
-int parse_three_regs();
+int parse_three_regs(char *p, int rs, int rt, int rd, int line_num);
+skip_whitespaces(p);
+/* skip whitespaces*/
+/* check $ sign*/
+/* check number or reg is 0-31*/
+/* do it 3 times */
 int parse_two_regs();
 int parse_reg_number_reg();
 int parse_two_regs_label();
 int parse_label_or_reg();
 int parse_label();
 int validate_hlt();
+
+int skip_whitespaces(char *p, int line_num) {
+    while (*p== ' ' || *p== '\t'){
+        p++;
+    }
+    return 1;
+}
+int is_comma(char *p, int line_num){
+    if (*p== ','){
+        return 1;
+    }
+    printf ("Error in line %d a comma is missing ", line_num);
+    return 0;
+}
+int is_reg_sym(char *p, int line_num){
+    if (*p == '$'){
+        p++;
+        if (*p < '0' || *p > '9')
+            printf ("Error in register name after '$' a digit is needed in line %d", line_num);
+            return 0;
+        return 1;
+    }
+    printf ("Error in register name '$' is needed in line %d", line_num);
+    return 0;
+}
+int is_valid_reg_num(char *p, int line_num){
+    int value = 0;
+    if (*p < '0' || *p > '9')
+        return 0;    
+    value = (*p - '0'); /* one digit*/
+    p++; 
+    if (*p >= '0' && *p <= '9'){ /*if second digit exists under these conditions add the single digit to the value *10*/
+        value = value * 10 + (*p - '0');
+        p++; /*move pointer past the digit*/
+    }
+    if (value > 31)
+        return 0;
+
+    if (*p >= '0' && *p <= '9')
+        printf ("Invalid register number in line %d", line_num); 
+        return 0;        
+    return 1;
+
+}
 /*
 free_symbol(){};
 */
