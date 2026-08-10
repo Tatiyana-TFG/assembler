@@ -55,56 +55,62 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 error_flag++;
                 continue;
                }
-               switch (operation->operands_type) {
-                case THREE_REG:
-                if (!parse_three_regs(p, &rs, &rt,&rd,line_num)){
-                    error_flag ++;
-                    continue;
-                }
-                break; /*finish inner switch and do whats after the switch ie encode*/
-                case TWO_REG:
-                if (!parse_two_regs(p, &rs, &rt,line_num)){
-                    error_flag ++;
-                    continue;
-                }
-                break; 
+                switch (operation->operands_type) {
+                    case THREE_REG:
+                    if (!parse_three_regs(p, &rs, &rt,&rd,line_num)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break; /*finish inner switch and do whats after the switch ie encode*/
+                    case TWO_REG:
+                    if (!parse_two_regs(p, &rs, &rt,line_num)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break; 
 
-                case REG_NUMBER_REG:
-                 if (!parse_reg_number_reg(p, &rs, &imd, &rt,line_num)){
-                    error_flag ++;
-                    continue;
-                }
-                break;
+                    case REG_NUMBER_REG:
+                    if (!parse_reg_number_reg(p, &rs, &imd, &rt,line_num)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break;
 
-                case TWO_REGS_LABEL:
-                    if (!parse_two_label(p, &rs, &label, &rt, line_num,mcro_head)){
-                    error_flag ++;
-                    continue;
-                }
-                break;
+                    case TWO_REGS_LABEL:
+                        if (!parse_two_regs_label(p, &rs, label, &rt, line_num,mcro_head)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break;
 
-                case LABEL_OR_REG:
-                    if (!parse_label_or_reg(p, &rs, &label,line_num, mcro_head)){
-                    error_flag ++;
-                    continue;
-                }
-                break;
+                    case LABEL_OR_REG:
+                        if (!parse_label_or_reg(p, &rs, label,line_num, mcro_head)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break;
 
-                case LABEL_ONLY:
-                if (!parse_label(p, &label,line_num, mcro_head)){
-                    error_flag ++;
-                    continue;
-                }
-                break;
+                    case LABEL_ONLY:
+                    if (!parse_label(p, &label,line_num, mcro_head)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break;
 
-                case NO_OPERANDS:
-                if (!validate_hlt(p,line_num)){
-                    error_flag ++;
-                    continue;
+                    case NO_OPERANDS:
+                    if (!validate_hlt(p,line_num)){
+                        error_flag ++;
+                        continue;
+                    }
+                    break;
                 }
-                break;
-               }
 
+                switch (operation->format){
+                    case 'R':
+                    case 'I':
+                    case 'J':
+
+                }
                case LINE_DIRECTIVE:
                dt = classify_dir(p);
                switch (dt){
