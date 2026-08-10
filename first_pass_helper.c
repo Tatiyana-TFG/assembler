@@ -187,10 +187,9 @@ int value = 0;
 
 }
 
-int read_imd (){}
+int read_imd (char **p, int *num, int line_num){}
 
-int read_label(){}
-
+int read_label(char **p, char *label,int line_num){}
 
 int parse_three_regs(char *p, int *rs, int *rt, int *rd, int line_num){
 /*skip whitespaces -> check reg (including $ and valid number) -> skipws before and after comma -> check comma -> read register ...*/
@@ -223,7 +222,7 @@ skip_whitespaces(&p);
 if (!is_comma(&p,line_num))
     return 0;
 skip_whitespaces(&p);
-if (!read_reg(&p,rs,line_num))
+if (!read_reg(&p,rt,line_num))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
@@ -241,6 +240,7 @@ if (!is_comma(&p,line_num))
 skip_whitespaces(&p);
 if (!read_imd(&p, imd, line_num))
     return 0;
+skip_whitespaces(&p);
 if (!is_comma(&p,line_num))
     return 0;
 skip_whitespaces(&p);
@@ -263,8 +263,12 @@ skip_whitespaces(&p);
 if (!read_reg(&p,rt,line_num))
     return 0;
 skip_whitespaces(&p);
-if (!(read_label()))
+if (!is_comma(&p,line_num))
     return 0;
+skip_whitespaces(&p);
+if (!(read_label(&p, label, line_num)))
+    return 0;
+skip_whitespaces(&p);
 if (!check_end(&p, line_num))
     return 0;
 return 1;
@@ -272,20 +276,22 @@ return 1;
 
 int parse_label_or_reg(char *p, int *rs, char *label, int line_num){
 skip_whitespaces(&p);
-if (!(read_reg(&p,rs, line_num))){
-    if (!read_label()){
+if (*p == '$') {
+    if (!(read_reg(&p,rs,line_num)))
         return 0;
-    }
+} else 
+    if(!(read_label(&p,label,line_num))){
+        return 0;
+}
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
     return 0;
-}
 return 1;
 }
 
 int parse_label(char *p, char *label, int line_num){
 skip_whitespaces(&p);
-if (!read_label())
+if (!read_label(&p,label,line_num))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
@@ -294,18 +300,8 @@ return 1;
 }
 
 int validate_hlt(char *p,int line_num){
-char *tok;
-char token[MAX_LINE];
 skip_whitespaces(&p);
-tok=p;
-tok = strtok(tok, '\n \t \0 ');
-strcpy(token, tok);
-if (!strcmp(token, 'hlt'))
-    printf("Error: should be a hlt command but is not in line %d", line_num);
-    return 0;
-if (!check_end(&p, line_num))
-    return 0;
-return 1;
+return check_end(&p,line_num);
 }
 
 
