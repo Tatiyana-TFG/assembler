@@ -4,7 +4,5 @@
 
 #define MAX_LINE 83
 #define MAX_NAME 32
-
   
-
   #endif

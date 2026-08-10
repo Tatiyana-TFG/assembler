@@ -31,7 +31,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
     p=line;
     has_label =is_label(&p, label_name, mcro_head);
     if (has_label == -1){
-        printf("Error: Invalid label name %d \n", line_num);
+        printf("Error: in label name in line %d \n", line_num);
         error_flag ++;
         continue;
     }

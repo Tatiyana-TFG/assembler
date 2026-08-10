@@ -31,22 +31,22 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
     }
 
 
-    while (fgets(line,MAX_LINE,in) != NULL)
+    while (fgets(line,MAX_LINE,in) != NULL) /* get lines and look for macro definitions*/
     {
         strcpy(tmp,line);
         line_num ++;
-        token = strtok(tmp, " \t\n");  /* get first token find the macros*/
+        token = strtok(tmp, " \t\n");  /* get first token */
 
-        if (line_too_long(line,in)){
+        if (line_too_long(line,in)){ /* line length check*/
             printf("Error: Line %d too long\n" , line_num);
             continue;   
         }
             
-        if (token && strcmp(token, "mcro") == 0){
-            token = strtok(NULL, " \t\n"); /* token = name of macro call*/
+        if (token && strcmp(token, "mcro") == 0){ /* if the token is macro*/
+            token = strtok(NULL, " \t\n"); /* the next token = name of macro call*/
 
     
-            if (token == NULL) {
+            if (token == NULL) { /* error if no macro name defined*/
                 printf("Error: macro name is missing in line %d \n", line_num);
                 fclose(in);
                 fclose(out);
@@ -55,11 +55,14 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
             }
 
             if (strlen(token) >= MAX_NAME){ /*check macro name length*/
-                printf("Error: Macro name in line %d is too long \n", line_num); 
+                printf("Error: Macro name in line %d is too long \n", line_num);
+                fclose(in);
+                fclose(out);
+                free_macros(mcro);
                 return -1;
             }
             
-            if (is_reserved(token) == 1)  { /* check name is reserved and illegal*/
+            if (is_reserved(token) == 1)  { /* check name is not reserved and illegal*/
                 printf("Error: macro name in line %d can't be a reserved name\n", line_num);
                 fclose(in);
                 fclose(out);
@@ -67,7 +70,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 return -1;
             }
             
-            if (find_macro(mcro,token) == 1) { /*check exists in macro table already*/ 
+            if (find_macro(mcro,token) == 1) { /*check if exists in macro table already*/ 
                 printf("Error: Macro name in line %d already exists\n" , line_num);
                 fclose(in);
                 fclose(out);
@@ -75,18 +78,18 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 return -1;
             }
             
-            if (strtok(NULL, " \t\n") != NULL) {  /*check nothing after name*/ 
+            if (strtok(NULL, " \t\n") != NULL) {  /*check nothing comes after name*/ 
                 printf ("Error: in line %d extra chars are not legal after mcro definition \n", line_num); 
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
                 return -1;
             
-            } else {
+            } else { /* passed all name checks (name can be any combination of letters symbols and numbers)*/
 
             mcro= add_macro(mcro,token,&error);            /* add name to table */
 
-            if (error){
+            if (error){ /*malloc failed*/
                 printf("Error: out of memory in macro table \n");
                 fclose(in);
                 fclose(out);
@@ -94,7 +97,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 return -1;
             }  
 
-            while (fgets(line,MAX_LINE,in)!= NULL) { /*go over each line and content to the table by rules below*/
+            while (fgets(line,MAX_LINE,in)!= NULL) { /*go over the line after mcro def and add cont to the table by rules below*/
                 line_num ++; /* line counter for error msgs*/
                 strcpy(tmp,line);
                 token = strtok(tmp, " \t\n");
