@@ -44,17 +44,18 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
             
         if (token && strcmp(token, "mcro") == 0){
             token = strtok(NULL, " \t\n"); /* token = name of macro call*/
-            if (strlen(token) > MAX_NAME){
-                printf("Error: Macro name in line %d is too long \n", line_num); /*check macro name length*/
-                return -1;
 
-            }
-
+    
             if (token == NULL) {
                 printf("Error: macro name is missing in line %d \n", line_num);
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
+                return -1;
+            }
+
+            if (strlen(token) >= MAX_NAME){ /*check macro name length*/
+                printf("Error: Macro name in line %d is too long \n", line_num); 
                 return -1;
             }
             
@@ -93,8 +94,8 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 return -1;
             }  
 
-            while (fgets(line,MAX_LINE,in)!= NULL) { /*add content to the table by line*/
-                line_num ++;
+            while (fgets(line,MAX_LINE,in)!= NULL) { /*go over each line and content to the table by rules below*/
+                line_num ++; /* line counter for error msgs*/
                 strcpy(tmp,line);
                 token = strtok(tmp, " \t\n");
 
@@ -103,8 +104,8 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                         continue;  
                 }
 
-                if (token && strcmp(token, "mcroend") == 0) {
-                    if (strtok(NULL, " \t\n") != NULL) { /* if extra chars break with error*/
+                if (token && strcmp(token, "mcroend") == 0) { /* is the token mcroend?*/
+                    if (strtok(NULL, " \t\n") != NULL) { /* if extra chars after mcroend break with error*/
                         printf ("Error: in line %d mcroend definition extra chars are not legal\n", line_num);
                         fclose(in);
                         fclose(out);
@@ -113,9 +114,8 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                     }
                     break; /* macroend termination */               
                 } else { 
-
-                    add_line(mcro,line,&error);
-                     if (error) {
+                    add_line(mcro,line,&error); /*add line content to table*/
+                     if (error) { /* if malloc cant allocate */
                         printf("Error: out of memory\n");
                         fclose(in);
                         fclose(out);
@@ -128,7 +128,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
             }
 
         } else {
-            /* loop the whole line against macro table */
+            /* find the macro against table and expand */
                 if (token && (find_macro(mcro,token))){
                     print_macro(mcro,out);
                 } else { 
