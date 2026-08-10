@@ -2,7 +2,7 @@
 #include <string.h>
 #include "datatypes.h"
 #include "macro_helpers.h"
-#define NUMBER_OF_OP_ELEMENTS 27;
+#define NUMBER_OF_OP_ELEMENTS 27
 
 
 static const Operation operation_info[] = {
@@ -129,62 +129,187 @@ strcpy(op,tok);
 return 1;
 }
 
-int parse_three_regs(char *p, int rs, int rt, int rd, int line_num);
-skip_whitespaces(p);
-/* skip whitespaces*/
-/* check $ sign*/
-/* check number or reg is 0-31*/
-/* do it 3 times */
-int parse_two_regs();
-int parse_reg_number_reg();
-int parse_two_regs_label();
-int parse_label_or_reg();
-int parse_label();
-int validate_hlt();
-
-int skip_whitespaces(char *p, int line_num) {
-    while (*p== ' ' || *p== '\t'){
-        p++;
+int check_end (char **p, int line_num){
+    if (**p != '\n' && **p != '\0' ){
+        printf("Error: execess elemnts after last register in line %d \n ", line_num);
+        return 0;
     }
     return 1;
 }
-int is_comma(char *p, int line_num){
-    if (*p== ','){
+
+int skip_whitespaces(char **p) {
+    while (**p== ' ' || **p== '\t'){
+        (*p)++;
+    }
+    return 1;
+}
+
+int is_comma(char **p, int line_num){
+
+    if (**p== ','){
+        (*p)++;
         return 1;
     }
     printf ("Error in line %d a comma is missing ", line_num);
     return 0;
 }
-int is_reg_sym(char *p, int line_num){
-    if (*p == '$'){
-        p++;
-        if (*p < '0' || *p > '9')
-            printf ("Error in register name after '$' a digit is needed in line %d", line_num);
-            return 0;
-        return 1;
-    }
-    printf ("Error in register name '$' is needed in line %d", line_num);
-    return 0;
-}
-int is_valid_reg_num(char *p, int line_num){
-    int value = 0;
-    if (*p < '0' || *p > '9')
-        return 0;    
-    value = (*p - '0'); /* one digit*/
-    p++; 
-    if (*p >= '0' && *p <= '9'){ /*if second digit exists under these conditions add the single digit to the value *10*/
-        value = value * 10 + (*p - '0');
-        p++; /*move pointer past the digit*/
-    }
-    if (value > 31)
-        return 0;
 
-    if (*p >= '0' && *p <= '9')
-        printf ("Invalid register number in line %d", line_num); 
-        return 0;        
+int read_reg(char **p, int *reg, int line_num){
+int value = 0;
+    if (**p != '$'){ /* check symbol is $ */
+        printf ("Error in register name '$' is needed in line %d", line_num);
+            return 0;
+    }
+    (*p)++;
+    if (**p < '0' || **p > '9'){ /* check after symbol there is digit*/
+        printf ("Error in register name after '$' a number is needed in line %d", line_num);
+        return 0; 
+    }
+           
+    value = (**p - '0'); /* there is one digit*/
+    (*p)++; 
+    if (**p >= '0' && **p <= '9'){ /*if second digit exists under these conditions add the single digit to the value of first digit mult by *10*/
+        value = value * 10 + (**p - '0'); /* get the nubmer by deducting ascii value of 0 from number*/
+        (*p)++; /*move pointer past the digit*/
+    }
+    if (value > 31) {
+        printf ("Register number can't be bigger than 31 %d \n " , line_num); 
+        return 0;
+    }
+
+    if (**p >= '0' && **p <= '9'){
+        printf ("Register number can't be bigger than 31 %d \n ", line_num); 
+        return 0;  
+    }
+    *reg = value; /*keep value of register and pass back to caller*/
+            
     return 1;
 
 }
+
+int read_imd (){}
+
+int read_label(){}
+
+
+int parse_three_regs(char *p, int *rs, int *rt, int *rd, int line_num){
+/*skip whitespaces -> check reg (including $ and valid number) -> skipws before and after comma -> check comma -> read register ...*/
+skip_whitespaces(&p);
+if (!read_reg(&p,rs,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_reg(&p,rt,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_reg(&p,rd,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+int parse_two_regs(char *p, int *rs, int *rt, int line_num){
+skip_whitespaces(&p);
+if (!read_reg(&p,rs,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_reg(&p,rs,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+int parse_reg_number_reg(char *p, int *rs, int *imd, int *rt, int line_num ){
+skip_whitespaces(&p);
+if (!read_reg(&p,rs,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_imd(&p, imd, line_num))
+    return 0;
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_reg(&p,rt,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+int parse_two_regs_label(char *p, int *rs, char *label, int *rt, int line_num ){
+skip_whitespaces(&p);
+if (!read_reg(&p,rs,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!is_comma(&p,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!read_reg(&p,rt,line_num))
+    return 0;
+skip_whitespaces(&p);
+if (!(read_label()))
+    return 0;
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+int parse_label_or_reg(char *p, int *rs, char *label, int line_num){
+skip_whitespaces(&p);
+if (!(read_reg(&p,rs, line_num))){
+    if (!read_label()){
+        return 0;
+    }
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+}
+return 1;
+}
+
+int parse_label(char *p, char *label, int line_num){
+skip_whitespaces(&p);
+if (!read_label())
+    return 0;
+skip_whitespaces(&p);
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+int validate_hlt(char *p,int line_num){
+char *tok;
+char token[MAX_LINE];
+skip_whitespaces(&p);
+tok=p;
+tok = strtok(tok, '\n \t \0 ');
+strcpy(token, tok);
+if (!strcmp(token, 'hlt'))
+    printf("Error: should be a hlt command but is not in line %d", line_num);
+    return 0;
+if (!check_end(&p, line_num))
+    return 0;
+return 1;
+}
+
+
+
 /*
 free_symbol(){};
 */

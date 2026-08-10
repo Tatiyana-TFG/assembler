@@ -48,15 +48,20 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         error_flag++; continue; /* need to add error print?*/
                     }
                }
-               operation = find_op(p);
-               if (operation = NULL){
+               operation = find_op(&p);
+               if (operation == NULL){
                 printf("Error: unknown operation in line %d\n",line_num);
                 error_flag++;
                 continue;
                }
                switch (operation->operands_type) {
                 case THREE_REG:
-                parse_three_reg(p, &rs, &rt,&rd);
+                if (!parse_three_reg(p, &rs, &rt,&rd,line_num)){
+                    error_flag ++;
+                    continue;
+                }
+                break; /*finish inner switch and do whats after the switch ie encode*/
+                
                 case TWO_REG:
                 case REG_NUMBER_REG:
                 case TWO_REGS_LABEL:

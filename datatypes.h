@@ -13,19 +13,10 @@ typedef struct Symbol {
     struct Symbol *next;
 } Symbol;
 
-
 typedef struct Symbol_table {
     Symbol *head;
     Symbol *tail;
 } Symbol_table;
-
-typedef struct Operation {
-    char name[MAX_LINE];
-    int opcode;
-    int funct;
-    char foramt;
-    Operands operands_type;
-} Operation;
 
 typedef enum Operands{
     THREE_REG,
@@ -36,6 +27,14 @@ typedef enum Operands{
     LABEL_ONLY,
     NO_OPERANDS
 } Operands;
+
+typedef struct Operation {
+    char name[MAX_LINE];
+    int opcode;
+    int funct;
+    char foramt;
+    Operands operands_type;
+} Operation;
 
 typedef struct Line {
       char text[MAX_LINE];
