@@ -55,14 +55,15 @@ void add_line (Macro *mcro, char *token, int *error){
       mcro->head = new_line;                /* if we inserted a new line point head to the new lien*/
       *error = 0;
   }
+
 void print_macro(Macro *mcro, FILE *out){
     Line *p = mcro->tail;
     while (p!= NULL){
         fputs(p->text,out);
         p= p ->prev;
     }
-
 }
+
  void free_macros(Macro *mcro) {
       while (mcro != NULL) {
           Macro *next_mcro = mcro->next;
@@ -87,6 +88,7 @@ int is_reserved(char *name) /* 0 if not reserved 1 if reserved*/
         "lb", "sb", "lw", "sw", "lh", "sh",
         "jmp", "la", "call", "hlt",
         ".db", ".dw", ".dh", ".asciz", ".entry", ".extern",
+        "db", "dw", "dh", "asciz", "entry", "extern",
         "mcro", "mcroend",
         NULL};
       
