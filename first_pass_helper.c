@@ -218,13 +218,33 @@ int read_imd (char **p, int *num, int line_num){
 
 }
 
-int read_label(char **p, char *label,int line_num, Macro *mcro){
-skip_whitespaces(&p);
-if (!valid_label(label,mcro))
+int read_label(char **p, char *label,int line_num, Macro *mcro_head){
+int len;
+char *start =  *p; /*point to the same place line points to*/
+char *pp= *p; /*point to the same place line points to*/
+
+/* 1 = valid lable 
+0 = bad lable */
+
+while (*pp != '\0' && *pp != '\t' && *pp != '\n' && *pp != ' ') *pp++; /* find first token*/
+len = p - start; /* counter of how many chars the token is */
+if (len == 0 || len >= MAX_NAME) { /* check length*/
+    printf("Error: Invalid label name in line %d \n", line_num);
+    return 0; /* invalid length*/
+}
+memcpy(label,start,len); /*copy to name from start at length of len*/
+label [len] = '\0'; /*add terminator \0 at the end*/
+
+if (label[len-  1] == ':'){ /*check no : after name*/
+    printf("Error: label name in line %d should not contain ':' after definition\n", line_num);
+    return 0;
+}
+skip_whitespaces(p);
+if (!valid_label(label,mcro_head)) /* check name validity*/
     printf("Error: invalid label name in line %d \n", line_num);
-    return -1;
-skip_whitespaces(&p);
-if (!check_end(&p, line_num))
+    return 0;
+skip_whitespaces(p);
+if (!check_end(p, line_num))
     return 0;
 return 1;
 }
@@ -290,7 +310,7 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_two_regs_label(char *p, int *rs, char *label, int *rt, int line_num ){
+int parse_two_regs_label(char *p, int *rs, char *label, int *rt, int line_num, Macro *macro_head ){
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
     return 0;
@@ -304,7 +324,7 @@ skip_whitespaces(&p);
 if (!is_comma(&p,line_num))
     return 0;
 skip_whitespaces(&p);
-if (!(read_label(&p, label, line_num)))
+if (!read_label(&p, label, line_num, macro_head))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
@@ -318,7 +338,7 @@ if (*p == '$') {
     if (!(read_reg(&p,rs,line_num)))
         return 0;
 } else 
-    if(!(read_label(&p,label,line_num, mcro))){
+    if(!(read_label(&p,label,line_num, macro_head))){
         return 0;
 }
 skip_whitespaces(&p);
@@ -329,7 +349,7 @@ return 1;
 
 int parse_label(char *p, char *label, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
-if (!read_label(&p,label,line_num, mcro))
+if (!read_label(&p,label,line_num, macro_head))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
