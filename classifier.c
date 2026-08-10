@@ -4,12 +4,10 @@
 #include <stdlib.h> 
 #include <string.h>
 
-
-
 int is_label(char **line, char *name, Macro *mcro){
   int len;
-  char *start =  *line;
-  char *p= *line;
+  char *start =  *line; /*point to the same place line points to*/
+  char *p= *line; /*point to the same place line points to*/
 
   /* 1 = valid lable 
   0 = : but no lable 
@@ -18,10 +16,10 @@ int is_label(char **line, char *name, Macro *mcro){
   while (*p != '\0' && *p != '\t' && *p != '\n' && *p != ' ' && *p != ':') p++; /* find first token*/
   if (*p == ':'){ /*check if : exists*/
     len = p - start; /* counter of how many chars the token is */
-    if (len == 0 || len > MAX_NAME -1) { /* check length*/
-      return -1; /* invalid label*/
+    if (len == 0 || len >= MAX_NAME) { /* check length*/
+      return -1; /* invalid length*/
     }
-    memcpy(name,start,len); /*copy name from start length of len to name*/
+    memcpy(name,start,len); /*copy to name from start at length of len*/
     name [len] = '\0'; /*add terminator \0 at the end*/
 
     if (valid_label(name,mcro)){ /*check if label is valid by other definitions*/

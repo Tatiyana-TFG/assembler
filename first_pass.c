@@ -12,8 +12,9 @@ line_type type;
 directive_type dt;
 FILE *in;
 int has_label;
-int rs,rt,rd;
+int rs,rt,rd,imd;
 char *p;
+char label[MAX_NAME];
 char op[MAX_NAME];
 char label_name[MAX_NAME];
 int error_flag =0;
@@ -56,19 +57,52 @@ while (fgets(line,MAX_LINE,in) != NULL){
                }
                switch (operation->operands_type) {
                 case THREE_REG:
-                if (!parse_three_reg(p, &rs, &rt,&rd,line_num)){
+                if (!parse_three_regs(p, &rs, &rt,&rd,line_num)){
                     error_flag ++;
                     continue;
                 }
                 break; /*finish inner switch and do whats after the switch ie encode*/
-                
                 case TWO_REG:
-                case REG_NUMBER_REG:
-                case TWO_REGS_LABEL:
-                case LABEL_OR_REG:
-                case LABEL_ONLY:
-                case NO_OPERANDS:
+                if (!parse_two_regs(p, &rs, &rt,line_num)){
+                    error_flag ++;
+                    continue;
+                }
+                break; 
 
+                case REG_NUMBER_REG:
+                 if (!parse_reg_number_reg(p, &rs, &imd, &rt,line_num)){
+                    error_flag ++;
+                    continue;
+                }
+                break;
+
+                case TWO_REGS_LABEL:
+                    if (!parse_two_label(p, &rs, &label, &rt, line_num,mcro_head)){
+                    error_flag ++;
+                    continue;
+                }
+                break;
+
+                case LABEL_OR_REG:
+                    if (!parse_label_or_reg(p, &rs, &label,line_num, mcro_head)){
+                    error_flag ++;
+                    continue;
+                }
+                break;
+
+                case LABEL_ONLY:
+                if (!parse_label(p, &label,line_num, mcro_head)){
+                    error_flag ++;
+                    continue;
+                }
+                break;
+
+                case NO_OPERANDS:
+                if (!validate_hlt(p,line_num)){
+                    error_flag ++;
+                    continue;
+                }
+                break;
                }
 
                case LINE_DIRECTIVE:

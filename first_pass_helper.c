@@ -218,7 +218,7 @@ int read_imd (char **p, int *num, int line_num){
 
 }
 
-int read_label(char **p, char *label,int line_num, Macro *mcro_head){
+int read_label(char **p, char *label,int line_num, Macro *mcro_head){/* check if it is a lable name without :*/
 int len;
 char *start =  *p; /*point to the same place line points to*/
 char *pp= *p; /*point to the same place line points to*/
@@ -226,8 +226,8 @@ char *pp= *p; /*point to the same place line points to*/
 /* 1 = valid lable 
 0 = bad lable */
 
-while (*pp != '\0' && *pp != '\t' && *pp != '\n' && *pp != ' ') *pp++; /* find first token*/
-len = p - start; /* counter of how many chars the token is */
+while (*pp != '\0' && *pp != '\t' && *pp != '\n' && *pp != ' ') pp++; /* find first token*/
+len = pp - start; /* counter of how many chars the token is */
 if (len == 0 || len >= MAX_NAME) { /* check length*/
     printf("Error: Invalid label name in line %d \n", line_num);
     return 0; /* invalid length*/
@@ -235,17 +235,19 @@ if (len == 0 || len >= MAX_NAME) { /* check length*/
 memcpy(label,start,len); /*copy to name from start at length of len*/
 label [len] = '\0'; /*add terminator \0 at the end*/
 
-if (label[len-  1] == ':'){ /*check no : after name*/
+if (label[len -  1] == ':'){ /*check no : after name*/
     printf("Error: label name in line %d should not contain ':' after definition\n", line_num);
     return 0;
 }
 skip_whitespaces(p);
-if (!valid_label(label,mcro_head)) /* check name validity*/
+if (!valid_label(label,mcro_head)){ /* check name validity*/
     printf("Error: invalid label name in line %d \n", line_num);
     return 0;
+} 
 skip_whitespaces(p);
 if (!check_end(p, line_num))
     return 0;
+*p=pp;
 return 1;
 }
 
