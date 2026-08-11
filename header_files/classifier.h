@@ -1,5 +1,6 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
+#include <datatypes.h>
 
 int valid_label(char *name, Macro *mcro);
 line_type classify_line(char *line);
