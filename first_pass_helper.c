@@ -372,6 +372,28 @@ skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
+int parse_data(char *p, int line_num, int num_of_bytes){
+int *pp = p; /* to not override caller pointer i made a copy*/
+char *token;
+char name[MAX_LINE];
+while (*pp == ' ' || *pp == '\t') pp++; /* skip whitespaces*/
+token = strtork(pp, '\t \n');
+if (token == NULL){
+    printf("Error: No directive name in line %d\n", line_num);
+    return 0;
+}
+/*check past first -> iof good continue per case*/
+strcmpy(name,token);
+/* neet to check each number is db = 1 byte dh = 2 bytes dw = 4bytes accordigly */
+if (name == ".db"){
+}
+if (name == ".dh"){
+}
+if (name == ".dw"){
+}
+
+}
+
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;
@@ -402,11 +424,13 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
 
     return inst_value;
 }
+
 store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
     inst_image[((*IC)-100)/4] = encoded_val; /*put encoded value in element 1 in the image array (ic holds 100)ic = 100 ->100 - 100 /4 => index 0 -> ic == 8 -> 108 - 100 /4 = index 2*/
     (*IC)+=4;
     return 1;
 }
+
 unsigned int store_dc_value(); 
 /*
 free_symbol(){};

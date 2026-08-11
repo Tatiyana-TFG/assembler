@@ -4,7 +4,7 @@
 #include <stdlib.h> 
 #include <string.h>
 
-int is_label(char **line, char *name, Macro *mcro){
+int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label definition with :*/
   int len;
   char *start =  *line; /*point to the same place line points to*/
   char *p= *line; /*point to the same place line points to*/
@@ -49,4 +49,4 @@ directive_type classify_dir (char *line){
   if (strncmp(line, ".db", 3) == 0 || strncmp(line, ".dh", 3) == 0 || strncmp(line, ".dw", 3) == 0)     return DATA;
   if (strncmp(line, ".asciz", 6) == 0)  return STRING;
   return BAD_DIR;
-}
+} /* need to fix strncp only checks prefix*/
