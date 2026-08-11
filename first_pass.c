@@ -13,11 +13,13 @@ directive_type dt;
 FILE *in;
 int has_label;
 int rs,rt,rd,imd;
+int reg_flag =0;
 char *p;
 char label[MAX_NAME];
 char op[MAX_NAME];
 char label_name[MAX_NAME];
 int error_flag =0;
+unsigned int encoded_val;
 const Operation *operation;
 
 /* open am file for reading after macro expension*/
@@ -77,14 +79,14 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     break;
 
                     case TWO_REGS_LABEL:
-                        if (!parse_two_regs_label(p, &rs, label, &rt, line_num,mcro_head)){
+                        if (!parse_two_regs_label(p, &rs, label, &rt, line_num ,mcro_head)){
                         error_flag ++;
                         continue;
                     }
                     break;
 
                     case LABEL_OR_REG:
-                        if (!parse_label_or_reg(p, &rs, label,line_num, mcro_head)){
+                        if (!parse_label_or_reg(p, &rs, label,reg_flag,line_num, mcro_head)){
                         error_flag ++;
                         continue;
                     }
@@ -107,8 +109,12 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                 switch (operation->format){
                     case 'R':
+                    encoded_val = encoder_r(operation ->opcode, rs, rt, rd, operation->funct);
                     case 'I':
+                    encoded_val = encoder_i(operation ->opcode, rs, rt, imd);
                     case 'J':
+                    encoded_val = encoder_j(operation ->opcode, reg_flag, rt, imd); /*need to get reg flag from label or reg */
+
 
                 }
                case LINE_DIRECTIVE:

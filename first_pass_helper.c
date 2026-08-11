@@ -334,11 +334,12 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_label_or_reg(char *p, int *rs, char *label, int line_num, Macro *macro_head){
+int parse_label_or_reg(char *p, int *rs, char *label,int reg_flag, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
 if (*p == '$') {
     if (!(read_reg(&p,rs,line_num)))
         return 0;
+    reg_flag = 1;
 } else 
     if(!(read_label(&p,label,line_num, macro_head))){
         return 0;
@@ -364,7 +365,35 @@ skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
+/*all encoders work the same -> move bits to designated position by bitwise operatoes */
+unsigned int encode_r(int opcode,int rs,int rt,int rd, int funct){
+    unsigned int inst_value =0;
+    inst_value |= (unsigned)opcode << 26;
+    inst_value |= (unsigned)rs << 21;
+    inst_value |= (unsigned)rt << 16;
+    inst_value |= (unsigned)funct << 6;
 
+    return inst_value;
+}
+
+unsigned int encode_i(int opcode, int rs, int rt, int immed){
+    unsigned int inst_value =0;
+    inst_value |= (unsigned)opcode << 26;
+    inst_value |= (unsigned)rs << 21;
+    inst_value |= (unsigned)rt << 16;
+    inst_value |= (unsigned)immed & 0xFFFF; /*get only 16 bit out of immed*/
+
+    return inst_value;
+}
+
+unsigned int encode_j(int opcode, int reg_flag, int address){
+    unsigned int inst_value =0;
+    inst_value |= (unsigned)opcode << 26;
+    inst_value |= (unsigned)reg_flag << 25;
+    inst_value |= (unsigned)address & 0x1FFFFFF; /* get 25 bits out of address */
+
+    return inst_value;
+}
 
 /*
 free_symbol(){};
