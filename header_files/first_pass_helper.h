@@ -16,8 +16,11 @@ int parse_three_regs(char *p, int *rs, int *rt, int *rd, int line_num);
 int parse_two_regs(char *p, int *rs, int *rt, int line_num);
 int parse_reg_number_reg(char *p, int *rs, int *imd, int *rt, int line_num );
 int parse_two_regs_label(char *p, int *rs, char *label,int *rt, int line_num, Macro *macro_head );
-int parse_label_or_reg(char *p, int *rs, char *label,int reg_flag, int line_num, Macro *macro_head);
+int parse_label_or_reg(char *p, int *rs, char *label,int *reg_flag, int line_num, Macro *macro_head);
 int parse_label(char *p, char *label, int line_num, Macro *macro_head);
 int validate_hlt(char *p,int line_num);
+unsigned int encoder_j(int opcode, int reg_flag, int address);
+unsigned int encoder_i(int opcode, int rs, int rt, int immed);
+unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct);
 #endif
 

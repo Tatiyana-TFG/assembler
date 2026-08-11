@@ -334,20 +334,26 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_label_or_reg(char *p, int *rs, char *label,int reg_flag, int line_num, Macro *macro_head){
+int parse_label_or_reg(char *p, int *address, char *label,int *reg_flag, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
 if (*p == '$') {
-    if (!(read_reg(&p,rs,line_num)))
+    if (!(read_reg(&p,rs,line_num))){
         return 0;
-    reg_flag = 1;
+    }
+    *reg_flag = 1;
 } else 
+    *reg_flag = 0;
+    *address = 0; /*placeholder until 2nd pass*/
+
     if(!(read_label(&p,label,line_num, macro_head))){
         return 0;
+
 }
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
     return 0;
 return 1;
+
 }
 
 int parse_label(char *p, char *label, int line_num, Macro *macro_head){

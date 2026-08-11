@@ -12,7 +12,7 @@ line_type type;
 directive_type dt;
 FILE *in;
 int has_label;
-int rs,rt,rd,imd;
+int rs,rt,rd,imd, address;
 int reg_flag =0;
 char *p;
 char label[MAX_NAME];
@@ -32,6 +32,7 @@ if (!in){
 while (fgets(line,MAX_LINE,in) != NULL){
     line_num ++;
     p=line;
+    rs = rt = rd = address = reg_flag = imd = 0;
     has_label =is_label(&p, label_name, mcro_head);
     if (has_label == -1){
         printf("Error: in label name in line %d \n", line_num);
@@ -86,14 +87,14 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     break;
 
                     case LABEL_OR_REG:
-                        if (!parse_label_or_reg(p, &rs, label,reg_flag,line_num, mcro_head)){
+                        if (!parse_label_or_reg(p, &address, label,&reg_flag,line_num, mcro_head)){
                         error_flag ++;
                         continue;
                     }
                     break;
 
                     case LABEL_ONLY:
-                    if (!parse_label(p, &label,line_num, mcro_head)){
+                    if (!parse_label(p,label,line_num, mcro_head)){
                         error_flag ++;
                         continue;
                     }
@@ -109,14 +110,17 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                 switch (operation->format){
                     case 'R':
-                    encoded_val = encoder_r(operation ->opcode, rs, rt, rd, operation->funct);
+                        encoded_val = encoder_r(operation ->opcode, rs, rt, rd, operation->funct);
+                        break;
                     case 'I':
-                    encoded_val = encoder_i(operation ->opcode, rs, rt, imd);
-                    case 'J':
-                    encoded_val = encoder_j(operation ->opcode, reg_flag, rt, imd); /*need to get reg flag from label or reg */
-
-
+                        encoded_val = encoder_i(operation ->opcode, rs, rt, imd);
+                        break;
+                    case 'J':    
+                        encoded_val = encoder_j(operation ->opcode, reg_flag, address );
+                        break;
                 }
+                store_value();
+
                case LINE_DIRECTIVE:
                dt = classify_dir(p);
                switch (dt){
