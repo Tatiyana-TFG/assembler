@@ -84,6 +84,16 @@ if (!is_reserved(name)){
     } return 0;
 }
 
+int find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
+        Symbol *p = symbols ->head;
+        while (p != NULL){
+            if (strcmp(p-> name,name)== 0)
+                return 1;
+            p = p->next;
+        }
+        return 0;
+    } 
+
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext) { /*success added on 1*/
     if (find_symbol(table,name) == 0){
         Symbol *curr = malloc(sizeof(Symbol));
@@ -109,16 +119,6 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
     } printf("Error: symbol '%s' already defined\n", name);
     return 0; /* 0 for not added */
 }
-
-int find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
-        Symbol *p = symbols ->head;
-        while (p != NULL){
-            if (strcmp(p-> name,name)== 0)
-                return 1;
-            p = p->next;
-        }
-        return 0;
-    } 
 
 int get_operand(char *p, char *op) {
 char *tok;
@@ -198,12 +198,12 @@ int read_imd (char **p, int *num, int line_num){
     if (**p == '+') /* sign exists go past it*/
         (*p)++;
 
-    if ( **p <'0' || **p >9){ /*check num is digit*/
+    if ( **p <'0' || **p >'9'){ /*check num is digit*/
         printf("Error: Invalid immed in line %d \n", line_num);
         return 0;
     }
 
-    while (**p >= '0' && **p <=9){
+    while (**p >= '0' && **p <= '9'){
         value = value *10 + (**p - '0'); /* get the int number*/
         (*p)++;
     }
@@ -239,15 +239,15 @@ if (label[len -  1] == ':'){ /*check no : after name*/
     printf("Error: label name in line %d should not contain ':' after definition\n", line_num);
     return 0;
 }
-skip_whitespaces(p);
+
 if (!valid_label(label,mcro_head)){ /* check name validity*/
     printf("Error: invalid label name in line %d \n", line_num);
     return 0;
 } 
-skip_whitespaces(p);
-if (!check_end(p, line_num))
+skip_whitespaces(&pp);
+if (!check_end(&pp, line_num))
     return 0;
-*p=pp;
+*p=pp; /* advance caller pointer to past label */
 return 1;
 }
 
@@ -274,7 +274,7 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_two_regs(char *p, int *rs, int *rt, int line_num){
+int parse_two_regs(char *p, int *rs, int *rd, int line_num){
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
     return 0;
@@ -282,7 +282,7 @@ skip_whitespaces(&p);
 if (!is_comma(&p,line_num))
     return 0;
 skip_whitespaces(&p);
-if (!read_reg(&p,rt,line_num))
+if (!read_reg(&p,rd,line_num))
     return 0;
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
@@ -334,21 +334,22 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
-int parse_label_or_reg(char *p, int *address, char *label,int *reg_flag, int line_num, Macro *macro_head){
+int parse_label_or_reg(char *p, int *address_or_reg, char *label,int *reg_flag, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
-if (*p == '$') {
-    if (!(read_reg(&p,rs,line_num))){
+if (*p == '$') { /* should there be a register?*/
+    if (!(read_reg(&p,address_or_reg,line_num))){ /*is reg valid?*/
         return 0;
     }
-    *reg_flag = 1;
-} else 
+    *reg_flag = 1; /* flag register */
+} else {
     *reg_flag = 0;
-    *address = 0; /*placeholder until 2nd pass*/
+    *address_or_reg = 0; /*placeholder until 2nd pass*/
 
-    if(!(read_label(&p,label,line_num, macro_head))){
+    if(!(read_label(&p,label,line_num, macro_head)))
         return 0;
 
-}
+    }
+
 skip_whitespaces(&p);
 if (!check_end(&p, line_num))
     return 0;
@@ -372,17 +373,18 @@ return check_end(&p,line_num);
 }
 
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */
-unsigned int encode_r(int opcode,int rs,int rt,int rd, int funct){
+unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
     inst_value |= (unsigned)rs << 21;
     inst_value |= (unsigned)rt << 16;
+    inst_value |= (unsigned)rd << 11;
     inst_value |= (unsigned)funct << 6;
 
     return inst_value;
 }
 
-unsigned int encode_i(int opcode, int rs, int rt, int immed){
+unsigned int encoder_i(int opcode, int rs, int rt, int immed){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
     inst_value |= (unsigned)rs << 21;
@@ -392,7 +394,7 @@ unsigned int encode_i(int opcode, int rs, int rt, int immed){
     return inst_value;
 }
 
-unsigned int encode_j(int opcode, int reg_flag, int address){
+unsigned int encoder_j(int opcode, int reg_flag, int address){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
     inst_value |= (unsigned)reg_flag << 25;
@@ -400,7 +402,12 @@ unsigned int encode_j(int opcode, int reg_flag, int address){
 
     return inst_value;
 }
-
+store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
+    inst_image[((*IC)-100)/4] = encoded_val; /*put encoded value in element 1 in the image array (ic holds 100)ic = 100 ->100 - 100 /4 => index 0 -> ic == 8 -> 108 - 100 /4 = index 2*/
+    (*IC)+=4;
+    return 1;
+}
+unsigned int store_dc_value(); 
 /*
 free_symbol(){};
 */

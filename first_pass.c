@@ -5,14 +5,14 @@
 #include <string.h>
 #include <stdio.h>
 
-int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
+int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
 int line_num=0;
 char line[MAX_LINE];
 line_type type;
 directive_type dt;
 FILE *in;
 int has_label;
-int rs,rt,rd,imd, address;
+int rs,rt,rd,imd, address_or_reg;
 int reg_flag =0;
 char *p;
 char label[MAX_NAME];
@@ -32,7 +32,7 @@ if (!in){
 while (fgets(line,MAX_LINE,in) != NULL){
     line_num ++;
     p=line;
-    rs = rt = rd = address = reg_flag = imd = 0;
+    rs = rt = rd = address_or_reg = reg_flag = imd = 0;
     has_label =is_label(&p, label_name, mcro_head);
     if (has_label == -1){
         printf("Error: in label name in line %d \n", line_num);
@@ -66,7 +66,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     }
                     break; /*finish inner switch and do whats after the switch ie encode*/
                     case TWO_REG:
-                    if (!parse_two_regs(p, &rs, &rt,line_num)){
+                    if (!parse_two_regs(p, &rs, &rd,line_num)){
                         error_flag ++;
                         continue;
                     }
@@ -87,7 +87,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     break;
 
                     case LABEL_OR_REG:
-                        if (!parse_label_or_reg(p, &address, label,&reg_flag,line_num, mcro_head)){
+                        if (!parse_label_or_reg(p, &address_or_reg, label,&reg_flag,line_num, mcro_head)){
                         error_flag ++;
                         continue;
                     }
@@ -116,10 +116,13 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         encoded_val = encoder_i(operation ->opcode, rs, rt, imd);
                         break;
                     case 'J':    
-                        encoded_val = encoder_j(operation ->opcode, reg_flag, address );
+                        encoded_val = encoder_j(operation ->opcode, reg_flag, address_or_reg );
                         break;
                 }
-                store_value();
+                if(!store_ic_value(encoded_val,IC,inst_image)){
+                    printf("Error: encodig error in line %d\n",line_num);
+                }
+                break;
 
                case LINE_DIRECTIVE:
                dt = classify_dir(p);
