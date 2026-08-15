@@ -372,26 +372,64 @@ skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
-int parse_data(char *p, int line_num, int num_of_bytes){
-int *pp = p; /* to not override caller pointer i made a copy*/
+int parse_data(char *p, int line_num, int data_array_count){ 
+int *pp = p; 
 char *token;
-char name[MAX_LINE];
 while (*pp == ' ' || *pp == '\t') pp++; /* skip whitespaces*/
-token = strtork(pp, '\t \n');
-if (token == NULL){
-    printf("Error: No directive name in line %d\n", line_num);
-    return 0;
+token = strtork(pp, '\t \n'); 
+
+/*function checks directive name -> calls op_loop -> op loop reads num and validates -> allocates mem and returns*/
+
+if (strcmp(token, ".db")==0){
+    return is_valid_op_loop(p,line_num,1 ,data_array_count);
 }
-/*check past first -> iof good continue per case*/
-strcmpy(name,token);
-/* neet to check each number is db = 1 byte dh = 2 bytes dw = 4bytes accordigly */
-if (name == ".db"){
+if (strcmp(token, ".dh")==0){
+    return is_valid_op_loop(p,line_num,2 ,data_array_count);
 }
-if (name == ".dh"){
+if (strcmp(token, ".dw")==0){
+    return is_valid_op_loop(p,line_num,4 ,data_array_count);
 }
-if (name == ".dw"){
 }
 
+int is_valid_data_value(int *p, int num_of_bytes){
+
+    if (num_of_bytes ==1) {
+/*need to advance p*/
+    }
+    if (num_of_bytes ==2) {
+        
+    }
+    if (num_of_bytes ==4) {
+        
+    }
+}
+
+long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int data_array_count, int num_of_bytes){
+long value;
+char *end;
+value = strtol(*p, &end, 10);
+if (!is_valid_data_value(p,line_num)){
+    printf("Error: invalid number in directive line %d\n", line_num);
+    return NULL;
+}
+while (*p != '\0'){
+
+}
+
+skip_whitespaces(&p);
+    if (!is_valid_byte(&p,line_num))
+    {
+        printf("Error: invalid number in line %d\n", line_num);
+        return 0;
+    } 
+}
+
+
+int parse_string(char *p){ /*NOT WORKINGG YET*/
+int *pp = p; /* to not override caller pointer i made a copy*/
+char *token;
+(strcmp(token, ".asciiz")==0){
+}
 }
 
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */

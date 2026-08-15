@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
     int IC = 100; /* instruction counter starts at 100 per spec */
     int DC = 0;   /* data counter starts at 0 */
     int i;
-    int data_image[1000];
-    int inst_image[1000];
+    unsigned int data_image[1000];
+    unsigned int inst_image[1000];
     Symbol_table externs;
     Symbol_table entry;
     Symbol_table symbols = { NULL, NULL };   /* head, tail */

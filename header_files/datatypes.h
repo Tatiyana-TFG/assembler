@@ -32,7 +32,7 @@ typedef struct Operation {
     char name[MAX_LINE];
     int opcode;
     int funct;
-    char foramt;
+    char format;
     Operands operands_type;
 } Operation;
 
