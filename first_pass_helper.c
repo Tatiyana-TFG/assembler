@@ -3,6 +3,12 @@
 #include "datatypes.h"
 #include "macro_helpers.h"
 #define NUMBER_OF_OP_ELEMENTS 27
+#define DB_MIN  (-128L)
+#define DB_MAX  255L
+#define DH_MIN  (-32768L)
+#define DH_MAX  65535L
+#define DW_MIN  (-2147483647L - 1L)
+#define DW_MAX  4294967295L
 
 
 static const Operation operation_info[] = {
@@ -372,64 +378,145 @@ skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
-int parse_data(char *p, int line_num, int data_array_count){ 
-int *pp = p; 
+int parse_encode_data(char *p, int line_num){ 
+long *data_op_array;
+int data_array_count = 0;
+char *line_end;
 char *token;
-while (*pp == ' ' || *pp == '\t') pp++; /* skip whitespaces*/
-token = strtork(pp, '\t \n'); 
+
+skip_whitespaces(&p); /* skip whitespaces*/
+line_end = p + strlen(p); /* point to last \0*/
+token = strtork(p, "\t \n"); 
+if (token == NULL) {
+    printf("Error: missing data directive in line %d\n",line_num);
+        return 0;
+}
+
+if (p < line_end){
+    p++; /* if its not the last or only token then go past the null terminator created by strtok*/
+}
+skip_whitespaces(&p);
+
+if (*p == '\0' || *p == '\n') {
+    printf("Error: expected at least one number in line %d\n",line_num);
+    return 0;
+  }
 
 /*function checks directive name -> calls op_loop -> op loop reads num and validates -> allocates mem and returns*/
-
 if (strcmp(token, ".db")==0){
-    return is_valid_op_loop(p,line_num,1 ,data_array_count);
+    data_op_array = is_valid_op_loop(p,line_num,1 , &data_array_count);
+    if (data_op_array == NULL){
+
+    }else{ 
+        encode();
+        free(data_op_array);
+        return 1;
+    }
 }
+
 if (strcmp(token, ".dh")==0){
-    return is_valid_op_loop(p,line_num,2 ,data_array_count);
+    data_op_array =  is_valid_op_loop(p,line_num,2 , &data_array_count);
+   if (data_op_array == NULL){
+
+    }else{ 
+        encode();
+        free(data_op_array);
+        return 1;
+    }
 }
+
 if (strcmp(token, ".dw")==0){
-    return is_valid_op_loop(p,line_num,4 ,data_array_count);
-}
-}
+    data_op_array =  is_valid_op_loop(p,line_num,4 , &data_array_count);
+   if (data_op_array == NULL){
 
-int is_valid_data_value(int *p, int num_of_bytes){
 
-    if (num_of_bytes ==1) {
-/*need to advance p*/
-    }
-    if (num_of_bytes ==2) {
-        
-    }
-    if (num_of_bytes ==4) {
-        
+    }else{ 
+        encode();
+        free(data_op_array);
+        return 1;
     }
 }
+}
 
-long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int data_array_count, int num_of_bytes){
+
+int is_valid_data_value(long value, int num_of_bytes){ /* checks value between signed minimum and unsigned max for each data*/
+
+    if (num_of_bytes ==1)
+        return value >= DB_MIN && value <= DB_MAX;        
+
+    if (num_of_bytes ==2)
+        return value >= DH_MIN && value <= DH_MAX;
+
+    if (num_of_bytes ==4) 
+        return value >= DW_MIN && value <= DW_MAX;
+
+    return 0;
+    
+}
+
+long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_count){ /* function walks the line as long as not the end and checks each number then stores it */
 long value;
 char *end;
-value = strtol(*p, &end, 10);
-if (!is_valid_data_value(p,line_num)){
-    printf("Error: invalid number in directive line %d\n", line_num);
+long *data_array = NULL;
+long *temp; /* temp for realloc*/
+
+while (*p != '\0' && *p != '\n'){
+    skip_whitespaces(&p);
+
+    value = strtol(p, &end, 10); /* get first value*/
+    if (end == p) {
+        printf("Error: expected a numeric data value in line %d\n", line_num);
+        free(data_array);
+        return NULL;
+    }
+
+    if (!is_valid_data_value(value,num_of_bytes)){ /*check if value is 1/2/4 byte range*/
+    printf("Error: data value is out of range in line %d\n", line_num);
+    free(data_array);
     return NULL;
 }
-while (*p != '\0'){
+    temp = realloc (data_array, (*data_array_count +1 ) * sizeof(long)); /*realoc space for new number*/
 
-}
+    if (temp == NULL){
+        printf("Error: cannot allocate memory in line %d\n",line_num); /*fail*/
+        free(data_array);
+        return NULL;
+    }
+    data_array = temp; /* put reall*/
+    data_array[*data_array_count] = value; 
+    (*data_array_count) ++ ;
 
-skip_whitespaces(&p);
-    if (!is_valid_byte(&p,line_num))
-    {
-        printf("Error: invalid number in line %d\n", line_num);
-        return 0;
-    } 
-}
+    p = end; /* advance past first num*/
+    skip_whitespaces(&p);
+
+    if (*p == '\0' || *p == '\n') { /* end of line */ 
+        break;
+    }
+
+    if (!is_comma(&p, line_num)){ /* if not check for comma*/
+        free(data_array);
+        return NULL;
+    }
+    
+    skip_whitespaces(&p);
+
+    if (*p == '\0' || *p == '\n') { /* if only comma it is invalid must have number after*/
+        printf("Error: missing number after comma in line %d\n",line_num);
+        free(data_array);
+        return NULL;
+  }
+
+}    return data_array;
+
+} 
 
 
 int parse_string(char *p){ /*NOT WORKINGG YET*/
 int *pp = p; /* to not override caller pointer i made a copy*/
 char *token;
-(strcmp(token, ".asciiz")==0){
-}
+(strcmp(token, ".asciiz")==0);
+/* if ma */
+
 }
 
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */

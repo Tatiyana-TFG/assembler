@@ -6,19 +6,19 @@
 #include <stdio.h>
 
 int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
-int line_num=0;
+int line_num = 0;
 char line[MAX_LINE];
 line_type type;
 directive_type dt;
 FILE *in;
 int has_label;
 int rs,rt,rd,imd, address_or_reg;
-int reg_flag =0;
+int reg_flag = 0;
 char *p;
 char label[MAX_NAME];
 char op[MAX_NAME];
 char label_name[MAX_NAME];
-int error_flag =0;
+int error_flag = 0;
 unsigned int encoded_val;
 const Operation *operation;
 
@@ -39,7 +39,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
         error_flag ++;
         continue;
     }
-    type = classify_line(p); 
+    type = classify_line(&p); 
         switch (type) {/* what kind of line? */
 
                case LINE_EMPTY:
@@ -119,6 +119,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         encoded_val = encoder_j(operation ->opcode, reg_flag, address_or_reg );
                         break;
                 }
+
                 if(!store_ic_value(encoded_val,IC,inst_image)){
                     printf("Error: encodig error in line %d\n",line_num);
                 }
@@ -129,7 +130,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                switch (dt){
                 case EXTERN:
                 if (get_operand(p,op)){
-                    if(add_symbol(externs,op, 0,0,0,0,1)==0){ /* need to add error print?*/
+                    if(add_symbol(externs,op, 0,0,0,0,1)==0){ 
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");
@@ -145,10 +146,19 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 continue;
 
                 case DATA:
+                if (has_label) {
+                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
+                    error_flag++; continue;
+                    }
+                } if (!parse_encode_data(p,line_num)) {
+                    error_flag ++;   continue;
+                }
+
+
                 case STRING:
                 if (has_label) {
-                if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
-                error_flag++; continue;
+                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
+                    error_flag++; continue;
                 }
             } /* encode the values into data_image[*DC ...]; *DC += count; */
             continue;         
