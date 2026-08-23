@@ -126,6 +126,8 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
     return 0; /* 0 for not added */
 }
 
+int add_extern(); /*ADD THIS*/
+
 int get_operand(char *p, char *op) {
 char *tok;
 strtok(p, " \t \n");
