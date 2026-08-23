@@ -378,7 +378,7 @@ skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
-int parse_encode_data(char *p, int line_num){ 
+int parse_encode_data(char *p, int line_num, unsigned char *data_image, int *DC){ 
 long *data_op_array;
 int data_array_count = 0;
 char *line_end;
@@ -407,9 +407,9 @@ if (*p == '\0' || *p == '\n') {
 if (strcmp(token, ".db")==0){
     data_op_array = is_valid_op_loop(p,line_num,1 , &data_array_count);
     if (data_op_array == NULL){
-
-    }else{ 
-        encode();
+        return 0;
+    } else{ /*encode per db = 1 byte */
+        encode_data(data_op_array, data_array_count, 1, data_image, DC);
         free(data_op_array);
         return 1;
     }
@@ -417,10 +417,10 @@ if (strcmp(token, ".db")==0){
 
 if (strcmp(token, ".dh")==0){
     data_op_array =  is_valid_op_loop(p,line_num,2 , &data_array_count);
-   if (data_op_array == NULL){
-
-    }else{ 
-        encode();
+    if (data_op_array == NULL){
+        return 0;
+    } else{ /*encode per db = 1 byte */
+        encode_data(data_op_array, data_array_count, 2, data_image, DC);
         free(data_op_array);
         return 1;
     }
@@ -429,16 +429,18 @@ if (strcmp(token, ".dh")==0){
 if (strcmp(token, ".dw")==0){
     data_op_array =  is_valid_op_loop(p,line_num,4 , &data_array_count);
    if (data_op_array == NULL){
-
-
-    }else{ 
-        encode();
+        return 0;
+    } else{ /*encode per db = 1 byte */
+        encode_data(data_op_array, data_array_count, 4, data_image, DC);
         free(data_op_array);
         return 1;
     }
 }
-}
 
+printf("Error: unknown data directive in line %d\n", line_num);
+return 0;
+
+}
 
 int is_valid_data_value(long value, int num_of_bytes){ /* checks value between signed minimum and unsigned max for each data*/
 
@@ -511,7 +513,6 @@ while (*p != '\0' && *p != '\n'){
 
 } 
 
-
 int parse_string(char *p){ /*NOT WORKINGG YET*/
 int *pp = p; /* to not override caller pointer i made a copy*/
 char *token;
@@ -549,6 +550,19 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
     inst_value |= (unsigned)address & 0x1FFFFFF; /* get 25 bits out of address */
 
     return inst_value;
+}
+
+void encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC){ /* from MSB byte <- LSB to LSB byte <- MSB*/
+    int byte_ind, i;
+    unsigned long value;
+    for (i = 0; i < data_array_count; i ++){ /* how many numbers we have? */
+        value = (unsigned long)data_op_array[i];
+
+        for (byte_ind = 0; byte_ind < num_of_bytes; byte_ind ++){ /* what size are these numbers? iterate number of bytes and insert into data image in little endian*/
+            data_image[*DC] = (unsigned char) ((value >> (byte_ind *8)) & 0xFFUL); /* shift the byte to the right (each byte is shifter a diff amount) and mask the rightmost byte and insert into image*/
+            (*DC) ++; /* advance to the next DC per byte each time since we read a byte at a time*/
+        }
+    }
 }
 
 store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){

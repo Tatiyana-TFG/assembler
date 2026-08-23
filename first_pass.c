@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
+int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
 int line_num = 0;
 char line[MAX_LINE];
 line_type type;
@@ -150,6 +150,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                     }
+                    /* add a check that image data is not full*/
                 } if (!parse_encode_data(p,line_num, data_image, DC)) {
                     error_flag ++;   continue;
                 }

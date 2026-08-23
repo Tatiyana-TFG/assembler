@@ -4,17 +4,15 @@
 #include "macro.h"
 #include "macro_helpers.h"
 
-int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, int *inst_image, int *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry);
+int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry);
 
 int main(int argc, char *argv[]) {
     char src[256], am[256]; /* maybe should also be dynamic */
     int IC = 100; /* instruction counter starts at 100 per spec */
     int DC = 0;   /* data counter starts at 0 */
     int i;
-    unsigned int data_image[1000];
+    unsigned char data_image[1000];
     unsigned int inst_image[1000];
-    Symbol_table externs;
-    Symbol_table entry;
     Symbol_table symbols = { NULL, NULL };   /* head, tail */
     Symbol_table externs = { NULL, NULL };
     Symbol_table entry = { NULL, NULL };
