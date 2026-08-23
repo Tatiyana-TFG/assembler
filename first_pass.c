@@ -39,7 +39,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
         error_flag ++;
         continue;
     }
-    type = classify_line(&p); 
+    type = classify_line(p); 
         switch (type) {/* what kind of line? */
 
                case LINE_EMPTY:
@@ -150,7 +150,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                     }
-                } if (!parse_encode_data(p,line_num)) {
+                } if (!parse_encode_data(p,line_num, data_image, DC)) {
                     error_flag ++;   continue;
                 }
 
@@ -174,4 +174,3 @@ fclose(in);
 if (error_flag) return -1;
 return 0;
 }/*funct*/
-

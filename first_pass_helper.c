@@ -386,14 +386,15 @@ char *token;
 
 skip_whitespaces(&p); /* skip whitespaces*/
 line_end = p + strlen(p); /* point to last \0*/
-token = strtork(p, "\t \n"); 
+token = strtok(p, "\t \n"); 
 if (token == NULL) {
     printf("Error: missing data directive in line %d\n",line_num);
         return 0;
 }
+p = token + strlen(p); /* update p to point on last char \0*/
 
 if (p < line_end){
-    p++; /* if its not the last or only token then go past the null terminator created by strtok*/
+    p++; /* if its not the last or only token then go past the  \0 created by strtok*/
 }
 skip_whitespaces(&p);
 
