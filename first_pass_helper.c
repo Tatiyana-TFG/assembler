@@ -393,7 +393,7 @@ if (token == NULL) {
     printf("Error: missing data directive in line %d\n",line_num);
         return 0;
 }
-p = token + strlen(p); /* update p to point on last char \0*/
+p = token + strlen(token); /* update p to point on last char \0*/
 
 if (p < line_end){
     p++; /* if its not the last or only token then go past the  \0 created by strtok*/
@@ -515,14 +515,43 @@ while (*p != '\0' && *p != '\n'){
 
 } 
 
-int parse_string(char *p){ /*NOT WORKINGG YET*/
-int *pp = p; /* to not override caller pointer i made a copy*/
-char *token;
-(strcmp(token, ".asciiz")==0);
-/* if ma */
+int parse_string(char *p, int line_num){ /*NOT WORKINGG YET*/
+char *token, *line_end, *pp, *string_end, *string_start, *string_length;
+pp = p;
+line_end = pp+ strlen(pp);
+token = strtok(pp, "\t \n");
+if (token == NULL){
+    printf("Error: Missing infirmation in line %d\n" , line_num);
+    return -1;
+}
+pp = token + strlen(token);
+
+if (pp < line_end)
+    pp++;
+
+skip_whitespaces(&pp);
+
+if (*pp != '"')
+    printf("Error: extra chars after string in line %d\n" , line_num);
+    return -1;
+
+pp++; /*if opening " exist - skip past it "*/
+string_start = pp;
+
+while (*pp != '"' && *pp != '\n' && *pp != '\0')
+    pp++;
+
+if (*pp != '"'){
+    printf("Error: missing closing quotes in line %d\n", line_num);
+    return -1;
+}
+string_end = pp;
+string_length = string_end - string_start;
+
+/* check no extra chars after string*/
+/*encode the strlength string*/
 
 }
-
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;

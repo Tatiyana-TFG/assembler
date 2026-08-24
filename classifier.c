@@ -44,7 +44,7 @@ line_type classify_line(char *line){
 
 directive_type classify_dir (char *line, int line_num){
   char line_copy[MAX_LINE];
-  char *token;
+  char *token, *line_p;
   strcpy(line_copy, line); /* copy original line to line copy*/
   char *line_p = line_copy; /* point at line copy */
 
@@ -60,4 +60,6 @@ directive_type classify_dir (char *line, int line_num){
   if (strcmp(token,".entry") == 0) return ENTRY;
   if (strcmp(token,".dh") == 0 || strcmp(token,".db") == 0 ||  strcmp(token,".dw") == 0)return DATA;
   if (strcmp(token,".asciz") == 0) return STRING;
+
+return BAD_DIR;
 }
