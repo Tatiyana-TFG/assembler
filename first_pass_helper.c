@@ -515,14 +515,14 @@ while (*p != '\0' && *p != '\n'){
 
 } 
 
-int parse_string(char *p, int line_num){ /*NOT WORKINGG YET*/
+int parse_string(char *p, int line_num, unsigned char *data_image, int *DC){ 
 char *token, *line_end, *pp, *string_end, *string_start, *string_length;
 pp = p;
 line_end = pp+ strlen(pp);
 token = strtok(pp, "\t \n");
 if (token == NULL){
     printf("Error: Missing infirmation in line %d\n" , line_num);
-    return -1;
+    return 0;
 }
 pp = token + strlen(token);
 
@@ -533,25 +533,40 @@ skip_whitespaces(&pp);
 
 if (*pp != '"')
     printf("Error: extra chars after string in line %d\n" , line_num);
-    return -1;
+    return 0;
 
 pp++; /*if opening " exist - skip past it "*/
 string_start = pp;
 
-while (*pp != '"' && *pp != '\n' && *pp != '\0')
+while (*pp != '"' && *pp != '\n' && *pp != '\0') /*skip all chars*/
     pp++;
 
-if (*pp != '"'){
+if (*pp != '"'){ /*closing char dosent exist*/
     printf("Error: missing closing quotes in line %d\n", line_num);
-    return -1;
+    return 0;
 }
+
+if (*pp != '\0 \n \n'){ /*check no extra chars after closing quotes*/
+    printf("Error: extra chars after closing quotes are not allowed in line %d\n", line_num);
+    return 0;
+}
+
 string_end = pp;
-string_length = string_end - string_start;
+string_length = string_end - string_start; /* dont need string length?*/
 
-/* check no extra chars after string*/
-/*encode the strlength string*/
-
+/* loop from string start length of string length and each char put into data image */
+while (string_start < string_end ){
+    data_image[*DC] = *string_start; /* insert char value to data image*/
+    (*DC) ++; /*advance DC counter*/
+    string_start++;
 }
+data_image[*DC] = '\0'; /* null term at the end of asciz*/
+(*DC)++;
+
+return 1;
+}
+
+
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;
@@ -596,19 +611,17 @@ void encode_data(const long *data_op_array, int data_array_count, int num_of_byt
     }
 }
 
-store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
+void store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
     inst_image[((*IC)-100)/4] = encoded_val; /*put encoded value in element 1 in the image array (ic holds 100)ic = 100 ->100 - 100 /4 => index 0 -> ic == 8 -> 108 - 100 /4 = index 2*/
     (*IC)+=4;
-    return 1;
 }
 
-unsigned int store_dc_value(); 
 /*
 free_symbol(){};
 */
 
 /*
- - Implement .asciz.
+ - Implement .asciz. ->
   - Correct .extern.
   - Defer or properly record .entry.
   - Stop DATA from falling through into STRING.
