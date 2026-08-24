@@ -577,3 +577,12 @@ unsigned int store_dc_value();
 /*
 free_symbol(){};
 */
+
+/*
+ - Implement .asciz.
+  - Correct .extern.
+  - Defer or properly record .entry.
+  - Stop DATA from falling through into STRING.
+  - Add final IC to every data symbol address.
+  - Add capacity checks.
+  */

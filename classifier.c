@@ -40,13 +40,24 @@ line_type classify_line(char *line){
   if (*line == '.')  return LINE_DIRECTIVE;
   return LINE_INSTRUCTION;
       
-    }
+}
 
-directive_type classify_dir (char *line){
-  while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
-  if (strncmp(line, ".extern", 7) == 0) return EXTERN;
-  if (strncmp(line, ".entry",  6) == 0) return ENTRY;
-  if (strncmp(line, ".db", 3) == 0 || strncmp(line, ".dh", 3) == 0 || strncmp(line, ".dw", 3) == 0)     return DATA;
-  if (strncmp(line, ".asciz", 6) == 0)  return STRING;
-  return BAD_DIR;
-} /* need to fix strncp only checks prefix*/
+directive_type classify_dir (char *line, int line_num){
+  char line_copy[MAX_LINE];
+  char *token;
+  strcpy(line_copy, line); /* copy original line to line copy*/
+  char *line_p = line_copy; /* point at line copy */
+
+  while (*line_p == ' ' || *line_p == '\t') line_p++; /* skip whitespaces*/
+  token = strtok(line_p, "\t \n"); /*point to first token*/
+
+  if (token == NULL){ /* check if token exists*/
+    printf("Error: missing dirictive in line %d\n", line_num);
+    return BAD_DIR;
+  }
+
+  if (strcmp(token,".extern") == 0) return EXTERN;
+  if (strcmp(token,".entry") == 0) return ENTRY;
+  if (strcmp(token,".dh") == 0 || strcmp(token,".db") == 0 ||  strcmp(token,".dw") == 0)return DATA;
+  if (strcmp(token,".asciz") == 0) return STRING;
+}
