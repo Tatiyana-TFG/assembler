@@ -1,14 +1,8 @@
 #include <stdlib.h> 
 #include <string.h>
 #include "datatypes.h"
+#include "constants.h"
 #include "macro_helpers.h"
-#define NUMBER_OF_OP_ELEMENTS 27
-#define DB_MIN  (-128L)
-#define DB_MAX  255L
-#define DH_MIN  (-32768L)
-#define DH_MAX  65535L
-#define DW_MIN  (-2147483647L - 1L)
-#define DW_MAX  4294967295L
 
 
 static const Operation operation_info[] = {
@@ -516,12 +510,13 @@ while (*p != '\0' && *p != '\n'){
 } 
 
 int parse_string(char *p, int line_num, unsigned char *data_image, int *DC){ 
-char *token, *line_end, *pp, *string_end, *string_start, *string_length;
+char *token, *line_end, *pp, *string_end, *string_start;
+int  string_length;
 pp = p;
 line_end = pp+ strlen(pp);
 token = strtok(pp, "\t \n");
 if (token == NULL){
-    printf("Error: Missing infirmation in line %d\n" , line_num);
+    printf("Error: Missing instruction/directive in line %d\n" , line_num);
     return 0;
 }
 pp = token + strlen(token);
@@ -532,14 +527,14 @@ if (pp < line_end)
 skip_whitespaces(&pp);
 
 if (*pp != '"'){
-    printf("Error: extra chars after string in line %d\n" , line_num);
+    printf("Error: missing opening quotes in line %d\n" , line_num);
     return 0;
 }
 
 pp++; /*if opening " exist - skip past it "*/
 string_start = pp;
 
-while (*pp != '"' && *pp != '\n' && *pp != '\0') /*skip all chars*/
+while (*pp != '"' && *pp != '\n' && *pp != '\0') /*skip all asciz chars*/
     pp++;
 
 if (*pp != '"'){ /*closing char dosent exist*/
@@ -547,16 +542,22 @@ if (*pp != '"'){ /*closing char dosent exist*/
     return 0;
 }
 
-if (*pp != '\0' || (*pp != '\n') || (*pp != '\t')){ /*check no extra chars after closing quotes*/
+string_end = pp; /* mark as the end"*/
+pp++; /*move past closing "quote"*/
+skip_whitespaces(&pp);
+
+if (*pp != '\0' && (*pp != '\n')){ /*check no extra chars after closing quotes*/
     printf("Error: extra chars after closing quotes are not allowed in line %d\n", line_num);
     return 0;
 }
 
-string_end = pp;
-string_length = string_end - string_start; /* dont need string length?*/
+string_length = string_end - string_start;
 
-/* check space for asciz in data image 
-*/
+/* check space for asciz in data image */
+if(string_length + 1 > IMAGE_CAPACITY - (*DC)) {
+    printf("Error: image capacity overflow in line %d \n", line_num);
+    return 0;
+}
 
 /* loop from string start length of string length and each char put into data image */
 while (string_start < string_end ){
