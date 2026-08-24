@@ -531,9 +531,10 @@ if (pp < line_end)
 
 skip_whitespaces(&pp);
 
-if (*pp != '"')
+if (*pp != '"'){
     printf("Error: extra chars after string in line %d\n" , line_num);
     return 0;
+}
 
 pp++; /*if opening " exist - skip past it "*/
 string_start = pp;
@@ -546,13 +547,16 @@ if (*pp != '"'){ /*closing char dosent exist*/
     return 0;
 }
 
-if (*pp != '\0 \n \n'){ /*check no extra chars after closing quotes*/
+if (*pp != '\0' || (*pp != '\n') || (*pp != '\t')){ /*check no extra chars after closing quotes*/
     printf("Error: extra chars after closing quotes are not allowed in line %d\n", line_num);
     return 0;
 }
 
 string_end = pp;
 string_length = string_end - string_start; /* dont need string length?*/
+
+/* check space for asciz in data image 
+*/
 
 /* loop from string start length of string length and each char put into data image */
 while (string_start < string_end ){
