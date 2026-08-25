@@ -135,7 +135,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                switch (dt){
                 case EXTERN:
                 if (get_operand(p,op)){
-                    if(add_symbol(externs,op, 0,0,0,0,1)==0){ /* NEED TO BUILD ADD_EXTERN WITH DIFFERENT RULES THAN ADD SYMBOL*/
+                    if(declare_extern(symbols,op)==0){ /* NEED TO BUILD ADD_EXTERN WITH DIFFERENT RULES THAN ADD SYMBOL*/
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");

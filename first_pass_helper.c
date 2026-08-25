@@ -84,14 +84,14 @@ if (!is_reserved(name)){
     } return 0;
 }
 
-int find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
+Symbol *find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
         Symbol *p = symbols ->head;
         while (p != NULL){
             if (strcmp(p-> name,name)== 0)
-                return 1;
+                return p;
             p = p->next;
         }
-        return 0;
+        return NULL;
     } 
 
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext) { /*success added on 1*/
@@ -121,21 +121,21 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
 }
 
 int declare_extern(Symbol_table *table, char *name){
-    if (find_symbol (table, name) == 0){
-        Symbol *curr = malloc(sizeof(Symbol));
-        if (!curr) {
-            printf("Error: cannot allocate space for %s\n " ,name);
+Symbol *found;
+found = find_symbol (table, name);
+    if (found == NULL) {
+        return add_symbol(table,name,0,0,0,0,1);
+    } else {
+        if (found->is_ext == 0) {  /*check if name is an extern attribute */
+            printf("Error: name '%s' is already declered and not as an exter\n", name);
             return 0;
-        }
-        else { /* if name alredy exists thats okay for extern*/
+        } else
             printf("Extern %s already defined (no error)\n" , name);
             return 1;
         } 
 
     }
 
-
-}
 
 int get_operand(char *p, char *op) {
 char *tok;

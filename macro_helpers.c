@@ -5,22 +5,23 @@
 
 int line_too_long(const char *line, FILE *fp) {
     int c;
-    if (strchr(line, '\n') == NULL && !feof(fp)) 
+    if (strchr(line, '\n') == NULL && (strlen(line) > 80)) 
     {
         while ((c = fgetc(fp)) != '\n' && c != EOF);
-        return 1;
+        /*consume extra chars*/
+        return 1; /*line is too long*/
     }
-    return 0;
+    return 0; /*line valid*/
 }
    
-int find_macro(Macro *head, char *name){ /* if found return 1 if not return 0*/                                                                                                                     
+Macro *find_macro(Macro *head, char *name){ /* if found return pointer*/                                                                                                                     
         Macro *p = head;                                                                                                       
         while (p != NULL) {                                                                                                    
             if (strcmp(p->name, name) == 0)                                                                                    
-                return 1;                                                                                                      
+                return p;                                                                                                      
             p = p->next;                                                                                                       
         }                                                                                                                      
-        return 0;                  
+        return NULL;               
     }
 
 Macro *add_macro (Macro *head, char *name, int *error){

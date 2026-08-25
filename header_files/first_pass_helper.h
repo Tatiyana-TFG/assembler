@@ -30,4 +30,3 @@ int is_valid_data_value(long value, int num_of_bytes);
 long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_count);
 unsigned int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]);
 #endif
-
