@@ -134,21 +134,23 @@ while (fgets(line,MAX_LINE,in) != NULL){
                dt = classify_dir(p, line_num);
                switch (dt){
                 case EXTERN:
-                if (get_operand(p,op)){
+                if (get_operand(p,op,line_num)){
                     if(declare_extern(symbols,op)==0){ /* NEED TO BUILD ADD_EXTERN WITH DIFFERENT RULES THAN ADD SYMBOL*/
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");
                 error_flag++; continue;
             
-                case ENTRY:
-                if (get_operand(p,op)){
+                case ENTRY: 
+                continue;
+
+                /* entry code to use later if (get_operand(p,op)){
                     if(add_symbol(entry,op, 0,0,0,1,0)==0){
                         error_flag++; continue;
                     } continue;
                 } printf("Error: opernad name not leagl\n");
-                error_flag++;
-                continue;
+                error_flag++;*/
+            
 
                 case DATA:
                 if (has_label) {
@@ -178,6 +180,6 @@ while (fgets(line,MAX_LINE,in) != NULL){
     }/*type switch*/
 }/*while loop*/
 fclose(in);
-if (error_flag) return -1;
+if (error_flag) return 0;
 return 0;
 }/*funct*/

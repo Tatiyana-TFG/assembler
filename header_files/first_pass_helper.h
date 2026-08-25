@@ -5,7 +5,7 @@
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext);
 int valid_label(char *name, Macro *mcro);
 Symbol *find_symbol(Symbol_table *symbols, char *name);
-int get_operand(char *p, char *op);
+int get_operand(char *p, char *op, int line_num ,Macro *mcro_head);
 const Operation *find_op(char **line);
 int check_end(char **p, int line_num);
 int skip_whitespaces(char **p);

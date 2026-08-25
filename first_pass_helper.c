@@ -137,14 +137,38 @@ found = find_symbol (table, name);
     }
 
 
-int get_operand(char *p, char *op) {
+int get_operand(char *p, char *op, int line_num, Macro *mcro_head) {
 char *tok;
-strtok(p, " \t \n");
-tok = strtok(NULL," \t \n");
-if (!tok) return 0;
-strcpy(op,tok);
+char *extra;
+
+tok = strtok(p, " \t \n"); /*directive*/
+tok = strtok(NULL," \t \n"); /*operand*/
+
+if (!tok){
+    printf("Error: missing operands in line %d\n", line_num);
+    return 0;
+}
+if (strlen(tok) >= MAX_NAME) {
+    printf("Error: operand is too long in line %d\n", line_num);
+    return 0;
+}
+    
+if (!valid_label(tok, mcro_head)) {
+    printf("Error: invalid label operand in line %d\n", line_num);
+    return 0;
+}
+
+extra = strtok(NULL, " \t\n");
+
+if (extra != NULL) {
+    printf("Error: extra text after operand in line %d\n", line_num);
+    return 0;
+}
+
+strcpy(op, tok); /*copy for caller function*/
 return 1;
 }
+
 
 int check_end (char **p, int line_num){
     if (**p != '\n' && **p != '\0' ){
