@@ -120,7 +120,22 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
     return 0; /* 0 for not added */
 }
 
-int add_extern(); /*ADD THIS*/
+int declare_extern(Symbol_table *table, char *name){
+    if (find_symbol (table, name) == 0){
+        Symbol *curr = malloc(sizeof(Symbol));
+        if (!curr) {
+            printf("Error: cannot allocate space for %s\n " ,name);
+            return 0;
+        }
+        else { /* if name alredy exists thats okay for extern*/
+            printf("Extern %s already defined (no error)\n" , name);
+            return 1;
+        } 
+
+    }
+
+
+}
 
 int get_operand(char *p, char *op) {
 char *tok;
@@ -571,7 +586,6 @@ data_image[*DC] = '\0'; /* null term at the end of asciz*/
 return 1;
 }
 
-
 /*all encoders work the same -> move bits to designated position by bitwise operatoes */
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;
@@ -603,7 +617,7 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
     return inst_value;
 }
 
-void encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC){ /* from MSB byte <- LSB to LSB byte <- MSB*/
+int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC){ /* from MSB byte <- LSB to LSB byte <- MSB*/
     int byte_ind, i;
     unsigned long value;
     for (i = 0; i < data_array_count; i ++){ /* how many numbers we have? */
@@ -614,11 +628,13 @@ void encode_data(const long *data_op_array, int data_array_count, int num_of_byt
             (*DC) ++; /* advance to the next DC per byte each time since we read a byte at a time*/
         }
     }
+    return 1;
 }
 
-void store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
+int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
     inst_image[((*IC)-100)/4] = encoded_val; /*put encoded value in element 1 in the image array (ic holds 100)ic = 100 ->100 - 100 /4 => index 0 -> ic == 8 -> 108 - 100 /4 = index 2*/
     (*IC)+=4;
+    return 1;
 }
 
 /*
@@ -626,10 +642,10 @@ free_symbol(){};
 */
 
 /*
- - Implement .asciz. ->
-  - Correct .extern.
-  - Defer or properly record .entry.
+  - Correct .extern. - add extern function
+  - Defer or properly record .entry. - what do we need to do here?
   - Stop DATA from falling through into STRING.
+  - Add free all dynamicly allocated storage at fail or done
   - Add final IC to every data symbol address.
-  - Add capacity checks.
-  */
+  - Second pass
+    */
