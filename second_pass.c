@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include "second_pass.h"
@@ -6,9 +5,8 @@
 #include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
-#include "macro.h"
 
-int second_pass(char *am, Macro *mcro_head, unsigned int *inst_image, Symbol_table *symbols) {
+int second_pass(char *am, Macro *mcro_head, unsigned int *inst_image, Symbol_table *symbols, Extern_table *externs) {
 FILE *in;
 char line[MAX_LINE];
 char label_name[MAX_NAME];
@@ -116,13 +114,33 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         error_flag ++;
                         continue;
                     }
-                    /*if its jmp label (jmp register was encoded in pass1)*/
-                    if (reg_flag == 0)
+                    /*if its for example jmp LABEL (bc jmp $register was encoded in pass1)*/
+                    if (reg_flag == 0) /*reg flag updated by parser*/
                         j_label = 1;
                 }
-                if (j_label){
-                    symbol = find_symbol(symbol, label_name));
-                }
+                if (j_label){ /*if it is a label we need to find the label and encode*/
+                    symbol = find_symbol(symbol, label_name);
+
+                    if (symbol == NULL) {
+                        printf("Error: jmp target %s is not defined in lined %d\n", label_name,line_num);
+                        error_flag++;
+                        continue;
+
+                    }
+                    index = ((inst_addr - 100))/4; /* get the address that we need to encode*/
+                    if (symbol -> is_ext) { /* encode 0 in the j addr field*/
+                        inst_image[index] = encoder_j(operation ->opcode, 0,0);
+                        
+                        if (add_ext_use(externs, label_name, inst_addr) ==0){/*record where external was used*/
+                            error_flag++;
+                            continue;
+                        }
+                    /*not external so need to encode the symbol's value and store in image*/
+                    } else { inst_image[index] = encoder_j (operation ->opcode, 0, symbol->value);
+
+                }  
+            }
+            continue;
                 
               
 

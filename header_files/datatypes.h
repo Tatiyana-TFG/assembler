@@ -6,12 +6,12 @@
 typedef struct Extern_symbol {
     char name[MAX_NAME];
     int address;
-    struct extern_table *next;
+    struct Extern_symbol *next;
 } Extern_symbol;
 
 typedef struct Extern_table {
-    Extern_table *head;
-    Extern_table *tail;
+    Extern_symbol *head;
+    Extern_symbol *tail;
 } Extern_table;
 
 typedef struct Symbol {
