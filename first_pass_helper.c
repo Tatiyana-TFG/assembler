@@ -137,7 +137,6 @@ found = find_symbol (table, name);
 
     }
 
-
 int get_operand(char *p, char *op, int line_num, Macro *mcro_head) {
 char *tok;
 char *extra;
@@ -169,7 +168,6 @@ if (extra != NULL) {
 strcpy(op, tok); /*copy for caller function*/
 return 1;
 }
-
 
 int check_end (char **p, int line_num){
     if (**p != '\n' && **p != '\0' ){
@@ -419,6 +417,7 @@ long *data_op_array;
 int data_array_count = 0;
 char *line_end;
 char *token;
+int success;
 
 skip_whitespaces(&p); /* skip whitespaces*/
 line_end = p + strlen(p); /* point to last \0*/
@@ -445,9 +444,9 @@ if (strcmp(token, ".db")==0){
     if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        encode_data(data_op_array, data_array_count, 1, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 1, data_image, DC);
         free(data_op_array);
-        return 1;
+        return success;
     }
 }
 
@@ -456,9 +455,9 @@ if (strcmp(token, ".dh")==0){
     if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        encode_data(data_op_array, data_array_count, 2, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 2, data_image, DC);
         free(data_op_array);
-        return 1;
+        return success;
     }
 }
 
@@ -467,9 +466,9 @@ if (strcmp(token, ".dw")==0){
    if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        encode_data(data_op_array, data_array_count, 4, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 4, data_image, DC);
         free(data_op_array);
-        return 1;
+        return success;
     }
 }
 
@@ -676,6 +675,7 @@ int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[])
     return 1;
 }
 
+int move_dc ();
 /*
 free_symbol(){};
 */

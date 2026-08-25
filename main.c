@@ -41,9 +41,9 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-    if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols,&externs,&entry)!= 0){
+    if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
         free_macros(mcro_head);
-        printf("Error:first pass input errors occured\n");
+        printf("Error:first pass errors occured\n");
         continue; /* got errors in first pass, continue to next file*/
     }
         
