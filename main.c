@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
         int name_length;
         unsigned char data_image[IMAGE_CAPACITY] = {0};
         unsigned int inst_image[IMAGE_CAPACITY] = {0};
+        Extern_table externs = {NULL, NULL};
         Symbol_table symbols = { NULL, NULL };   /* head, tail */
         int IC = 100; /* instruction counter starts at 100 per spec */
         int DC = 0;   /* data counter starts at 0 */
@@ -41,13 +42,18 @@ int main(int argc, char *argv[]) {
 
     if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
         free_macros(mcro_head);
+        free_symbols(symbols);
         printf("Error:first pass errors occured\n");
         continue; /* got errors in first pass, continue to next file*/
     }
-        
+    if (second_pass())
+
+
+
+    /*after second pas*/
     free_macros(mcro_head);
     /*free_ext_int();*/ 
-    return 0;
+    return 1;
 }
 
 }

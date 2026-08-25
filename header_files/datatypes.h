@@ -3,6 +3,17 @@
 #ifndef DATATYPES_H
 #define DATATYPES_H
 
+typedef struct Extern_symbol {
+    char name[MAX_NAME];
+    int address;
+    struct extern_table *next;
+} Extern_symbol;
+
+typedef struct Extern_table {
+    Extern_table *head;
+    Extern_table *tail;
+} Extern_table;
+
 typedef struct Symbol {
     char name[MAX_LINE];
     int value;
