@@ -675,7 +675,16 @@ int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[])
     return 1;
 }
 
-int move_dc ();
+int move_data_symbols (Symbol_table *symbols, int ICF) {
+    Symbol *curr;
+    curr = symbols -> head;
+    while (curr != NULL) { /*while not null*/
+        if (curr -> is_dat) { /* check each sym if its data*/
+            curr -> value += ICF; /* if it is advance value by last IC counter value which is ICF*/
+        }
+        curr = curr ->next; /* inside while -> move to next sym*/
+    }
+}
 /*
 free_symbol(){};
 */

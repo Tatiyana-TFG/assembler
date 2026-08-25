@@ -4,7 +4,7 @@
 #include "macro.h"
 #include "macro_helpers.h"
 
-int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry);
+int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols);
 
 int main(int argc, char *argv[]) {
     int i;
