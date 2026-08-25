@@ -84,7 +84,7 @@ if (!is_reserved(name)){
     } return 0;
 }
 
-Symbol *find_symbol(Symbol_table *symbols, char *name) {/* foud on 1*/
+Symbol *find_symbol(Symbol_table *symbols, char *name) { /*null if not found*/
         Symbol *p = symbols ->head;
         while (p != NULL){
             if (strcmp(p-> name,name)== 0)

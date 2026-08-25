@@ -1,6 +1,6 @@
+#include "first_pass_helper.h"
 #include "datatypes.h"
 #include "macro.h"
-#include "first_pass_helper.h"
 #include <stdlib.h> 
 #include <string.h>
 #include <stdio.h>
@@ -47,9 +47,9 @@ line_type classify_line(char *line){
 
 directive_type classify_dir (char *line, int line_num){
   char line_copy[MAX_LINE];
-  char *token;
+  char *token, line_p;
   strcpy(line_copy, line); /* copy original line to line copy*/
-  char *line_p = line_copy; /* point at line copy */
+  line_p = line_copy; /* point at line copy */
 
   while (*line_p == ' ' || *line_p == '\t') line_p++; /* skip whitespaces*/
   token = strtok(line_p, "\t \n"); /*point to first token*/

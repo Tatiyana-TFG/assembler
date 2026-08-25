@@ -4,7 +4,7 @@
 
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext);
 int valid_label(char *name, Macro *mcro);
-int find_symbol(Symbol_table *symbols, char *name);
+Symbol *find_symbol(Symbol_table *symbols, char *name);
 int get_operand(char *p, char *op);
 const Operation *find_op(char **line);
 int check_end(char **p, int line_num);
@@ -23,10 +23,11 @@ int validate_hlt(char *p,int line_num);
 unsigned int encoder_j(int opcode, int reg_flag, int address);
 unsigned int encoder_i(int opcode, int rs, int rt, int immed);
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct);
-void encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC);
+int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC);
 int parse_encode_data(char *p, int line_num, unsigned char *data_image, int *DC);
 int parse_string(char *p, int line_num, unsigned char *data_image, int *DC);
 int is_valid_data_value(long value, int num_of_bytes);
 long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_count);
-unsigned int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]);
+int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]);
+int declare_extern(Symbol_table *table, char *name);
 #endif

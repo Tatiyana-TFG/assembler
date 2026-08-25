@@ -5,7 +5,7 @@
   #include "datatypes.h"
   
   int line_too_long(const char *line, FILE *fp);
-  int find_macro(Macro *head, char *name); 
+  Macro *find_macro(Macro *head, char *name); 
   int is_reserved(char *name);
   Macro *add_macro(Macro *head, char *name, int *error);
   void add_line(Macro *mcro, char *text, int *error);
