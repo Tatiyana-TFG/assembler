@@ -645,8 +645,8 @@ int encode_data(const long *data_op_array, int data_array_count, int num_of_byte
     int byte_ind, i;
     unsigned long value;
     int required_bytes;
-    
-    required_bytes = data_array_count * num_of_bytes;
+
+    required_bytes = data_array_count * num_of_bytes; /*image capacity check*/
     if (required_bytes > IMAGE_CAPACITY - (*DC)) {
         printf("Error: Data image capacity is full\n");
         return 0;

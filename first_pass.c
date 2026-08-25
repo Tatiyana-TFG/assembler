@@ -134,7 +134,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                dt = classify_dir(p, line_num);
                switch (dt){
                 case EXTERN:
-                if (get_operand(p,op,line_num)){
+                if (get_operand(p,op,line_num, mcro_head)){
                     if(declare_extern(symbols,op)==0){ /* NEED TO BUILD ADD_EXTERN WITH DIFFERENT RULES THAN ADD SYMBOL*/
                         error_flag++; continue;
                     } continue;
@@ -168,7 +168,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                 }
-            } if (!parse_string(p, line_num, data_image, DC)) {
+            } if (!parse_encode_string(p, line_num, data_image, DC)) {
                 error_flag ++;
             } continue;
 
