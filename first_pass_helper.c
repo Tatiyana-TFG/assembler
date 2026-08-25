@@ -656,6 +656,12 @@ int encode_data(const long *data_op_array, int data_array_count, int num_of_byte
 }
 
 int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
+    int index;
+    index = (*IC - 100) / 4;
+    if (index >= IMAGE_CAPACITY){
+        printf("Error: Instruction image capacity is full\n");
+        return 0;
+    }
     inst_image[((*IC)-100)/4] = encoded_val; /*put encoded value in element 1 in the image array (ic holds 100)ic = 100 ->100 - 100 /4 => index 0 -> ic == 8 -> 108 - 100 /4 = index 2*/
     (*IC)+=4;
     return 1;
