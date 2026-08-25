@@ -644,6 +644,14 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
 int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC){ /* from MSB byte <- LSB to LSB byte <- MSB*/
     int byte_ind, i;
     unsigned long value;
+    int required_bytes;
+    
+    required_bytes = data_array_count * num_of_bytes;
+    if (required_bytes > IMAGE_CAPACITY - (*DC)) {
+        printf("Error: Data image capacity is full\n");
+        return 0;
+    }
+
     for (i = 0; i < data_array_count; i ++){ /* how many numbers we have? */
         value = (unsigned long)data_op_array[i];
 
