@@ -48,27 +48,6 @@ int main(int argc, char *argv[]) {
     free_macros(mcro_head);
     /*free_ext_int();*/ 
     return 0;
-    }
-   /*
-
- line_type type = classify_line(line){
-
-       switch (type) 
-               case LINE_EMPTY:
-               case LINE_COMMENT:
-                   break;
-               case LINE_INSTRUCTION:
-                   IC += 4;
-                   break;
-               case LINE_DIRECTIVE:
-                   DC += parse_directive(line);
-                   break;
-                
-                    return 0;
-
-           }
-     
-       */
-
+}
 
 }

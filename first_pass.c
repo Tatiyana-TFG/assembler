@@ -25,9 +25,9 @@ const Operation *operation;
 
 /* open am file for reading after macro expension*/
 in = fopen(am,"r");
-if (!in){
+if (in == NULL){
     printf("Error: cannot open %s\n", am); 
-    return -1;
+    return 0;
 
 }
 while (fgets(line,MAX_LINE,in) != NULL){
@@ -168,9 +168,9 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                 }
-            } if (parse_encode_string(p, line_num, data_image, DC) == 0) {
-                error_flag ++;
-            } continue;
+                } if (parse_encode_string(p, line_num, data_image, DC) == 0) {
+                    error_flag ++;
+                } continue;
 
             case BAD_DIR:
             printf("Error: unknown line directive in line %d\n", line_num);
