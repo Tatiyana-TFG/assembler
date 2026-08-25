@@ -130,12 +130,14 @@ found = find_symbol (table, name);
         if (found->is_ext == 0) {  /*check if name is an extern attribute */
             printf("Error: name '%s' is already declered and not as an exter\n", name);
             return 0;
-        } else
+        } else{
             printf("Extern %s already defined (no error)\n" , name);
             return 1;
-        } 
+        }
+           
+    } 
 
-    }
+ }
 
 int get_operand(char *p, char *op, int line_num, Macro *mcro_head) {
 char *tok;
@@ -675,7 +677,7 @@ int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[])
     return 1;
 }
 
-int move_data_symbols (Symbol_table *symbols, int ICF) {
+void move_data_symbols (Symbol_table *symbols, int ICF) {
     Symbol *curr;
     curr = symbols -> head;
     while (curr != NULL) { /*while not null*/

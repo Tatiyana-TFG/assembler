@@ -6,8 +6,7 @@
 #include <stdio.h>
 
 int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols) {
-int ICF;
-int DCF;
+
 int line_num = 0;
 char line[MAX_LINE];
 line_type type;
@@ -183,5 +182,9 @@ while (fgets(line,MAX_LINE,in) != NULL){
 fclose(in);
 /*movd dc size of IC*/
 if (error_flag) return 0;
+
+/*if first pass was successful move data +icf*/
+move_data_symbols(symbols, *IC);
 return 1;
+
 }/*firstpass*/
