@@ -30,12 +30,15 @@
 
 
 
-Extern_symbol *find_extern(Extern_table *externs, char *name) { /*null if not found works for externs*/
-        Extern_symbol *p = externs ->head;
-        while (p != NULL){
-            if (strcmp(p-> name,name)== 0)
-                return p;
-            p = p->next;
-        }
-        return NULL;
-    } 
+free_externs(Extern_table *externs) {
+    Extern_symbol *curr;
+    Extern_symbol *next; 
+
+    curr = externs ->head; /* set curr to be the head of table */
+
+    while (externs != NULL) { /*as long as the list is not empty set its next to be the next then free (curr) then move on to the next */
+        next = curr ->next;
+        free(curr);
+        curr = next;
+    }
+}

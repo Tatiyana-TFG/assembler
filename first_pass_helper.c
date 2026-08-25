@@ -692,8 +692,7 @@ free_symbol(Symbol_table *symbols) {
     Symbol *curr;
     Symbol *next; 
 
-    curr = symbols ->head; /* set curr to be the head of table */
-
+    curr = symbols ->head; /* set curr to be the list of table */
 
     while (symbols != NULL) { /*as long as the head is not empty set its next to be the next then free (curr) then move on to the next */
         next = curr ->next;
@@ -701,7 +700,6 @@ free_symbol(Symbol_table *symbols) {
         curr = next;
 
     }
-
 }
 
 /*
