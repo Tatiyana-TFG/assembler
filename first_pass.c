@@ -44,6 +44,10 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                case LINE_EMPTY:
                case LINE_COMMENT:
+                if (has_label) {
+                    printf("Error: label without statment in line %d\n", line_num);
+                    error_flag ++;
+                }
                continue;
 
                case LINE_INSTRUCTION:

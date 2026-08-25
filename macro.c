@@ -5,6 +5,8 @@
   #include "macro.h"
 
 int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
+    Macro *found;
+    char *extra;
     char tmp[MAX_LINE];
     char *token;
     int error_flag = 0;
@@ -72,7 +74,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 return 0;
             }
             
-            if (find_macro(mcro,token) == 1) { /*check if exists in macro table already*/ 
+            if (find_macro(mcro,token) != NULL) { /*check if exists in macro table already*/ 
                 printf("Error: Macro name in line %d already exists\n" , line_num);
                 fclose(in);
                 fclose(out);
@@ -131,18 +133,32 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
 
                 }
             }
-            }
+        }
 
         } else {
-            /* find the macro against table and expand */
-                if (token && (find_macro(mcro,token))){
-                    print_macro(mcro,out);
-                } else { 
-                fputs(line, out);
+            found = NULL; /* */
+            if (token != NULL) {
+                found = find_macro(mcro,token); /* if token tokenized the macro name see if it exists and retunr * to found*/
+            }
+
+            if (found != NULL) {
+                extra = strtok (NULL, " \t\n"); /* if the token exists we want to check nothing else comes after the name*/
+            
+
+                if (extra != NULL) {
+                    printf("Error: extra text after macro name '%s' in line %d\n", token, line_num);
+                    error_flag ++;
+                    continue;
+                }
+            
+            print_macro(mcro,out); 
+        } else {
+            fputs(line, out);
             }
         }
-    
     }
+
+    
 
     fclose(in);
     fclose(out);
