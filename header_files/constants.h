@@ -6,10 +6,12 @@
 #define MAX_NAME 32
 #define IMAGE_CAPACITY 1000
 #define NUMBER_OF_OP_ELEMENTS 27
-#define DB_MIN  (-128L)
-#define DB_MAX  255L
-#define DH_MIN  (-32768L)
-#define DH_MAX  65535L
-#define DW_MIN  (-2147483647L - 1L)
-#define DW_MAX  4294967295L
-  #endif
+#define DB_MIN (-128L)
+#define DB_MAX 255L
+#define DH_MIN (-32768L)
+#define DH_MAX 65535L
+#define DW_MIN (-2147483647L - 1L)
+#define DW_MAX 4294967295L
+#define BRANCH_DISTANCE_MIN (-32768)
+#define BRANCH_DISTANCE_MAX 32767
+#endif

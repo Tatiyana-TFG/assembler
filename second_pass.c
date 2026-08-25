@@ -1,7 +1,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "second_pass.h"
 #include "datatypes.h"
+#include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
 #include "macro.h"
@@ -13,12 +15,14 @@ char label_name[MAX_NAME];
 char op [MAX_NAME];
 char *p;
 int line_num;
+int rs,rt, distance, index, inst_addr;
 int curr_ic;
 int has_label;
 int error_flag;
 line_type type;
 directive_type dt;
 Symbol *symbol;
+const Operation *operation;
 
 
 line_num = 0;
@@ -54,9 +58,43 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 continue;
 
                case LINE_INSTRUCTION:
-                    /*encode j type;*/
+                inst_addr = curr_ic;
                 curr_ic +=4;
+                operation = find_op(&p);
+               if (operation == NULL){ /* to advance p past operation name */
+                printf("Error: unknown operation in line %d\n",line_num);
+                error_flag++;
                 continue;
+               }
+               if (operation -> operands_type == TWO_REGS_LABEL) { /* will handel branch operands here */
+                if (!parse_two_regs_label (p,&rs, label_name, &rt, line_num,mcro_head)){
+                    error_flag++;
+                    continue;
+                }
+                symbol = find_symbol(symbols, label_name); /*label name here is the second label name and not going to get LABEL: definition*/
+                if (symbol == NULL) {
+                    printf("Error: branch targer %s is not defined in line %d\n", label_name, line_num);
+                    error_flag++;
+                    continue;
+                }
+                if (symbol ->is_ext) {
+                    printf("Error: branch tager %s cannot be external in line %d\n", label_name, line_num);
+                    error_flag++;
+                    continue;
+                }
+                distance = symbol->value -inst_addr; /* find the distnace the action needs to use*/
+                
+                if (distance < BRANCH_DISTANCE_MIN || distance > BRANCH_DISTANCE_MAX) {
+                    printf("Error: branch distnace is out of range in line %d\n", line_num); /*check bounds for distance*/
+                    error_flag++;
+                    continue;
+                }
+                index = ((inst_addr - 100)/4); /*find the indext for the inst to encode full instruction*/
+                inst_image[index] = encoder_i(operation ->opcode, rs, rt, distance);
+                }
+
+                continue;
+
                case LINE_DIRECTIVE:
                dt = classify_dir(p, line_num);
                switch (dt) {
