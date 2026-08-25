@@ -47,7 +47,7 @@ line_type classify_line(char *line){
 
 directive_type classify_dir (char *line, int line_num){
   char line_copy[MAX_LINE];
-  char *token, line_p;
+  char *token, *line_p;
   strcpy(line_copy, line); /* copy original line to line copy*/
   line_p = line_copy; /* point at line copy */
 

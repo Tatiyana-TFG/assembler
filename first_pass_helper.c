@@ -1,5 +1,6 @@
 #include <stdlib.h> 
 #include <string.h>
+#include "first_pass_helper.h"
 #include "datatypes.h"
 #include "constants.h"
 #include "macro_helpers.h"
@@ -548,7 +549,7 @@ while (*p != '\0' && *p != '\n'){
 
 } 
 
-int parse_string(char *p, int line_num, unsigned char *data_image, int *DC){ 
+int parse_encode_string(char *p, int line_num, unsigned char *data_image, int *DC){ 
 char *token, *line_end, *pp, *string_end, *string_start;
 int  string_length;
 pp = p;

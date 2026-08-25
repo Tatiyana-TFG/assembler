@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 
-int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols, Symbol_table *externs, Symbol_table *entry) {
+int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols) {
 int line_num = 0;
 char line[MAX_LINE];
 line_type type;
@@ -135,7 +135,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                switch (dt){
                 case EXTERN:
                 if (get_operand(p,op,line_num, mcro_head)){
-                    if(declare_extern(symbols,op)==0){ /* NEED TO BUILD ADD_EXTERN WITH DIFFERENT RULES THAN ADD SYMBOL*/
+                    if(declare_extern(symbols,op)==0){ 
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");
@@ -158,7 +158,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     error_flag++; continue;
                     }
                     /* add a check that image data is not full*/
-                } if (!parse_encode_data(p,line_num, data_image, DC)) {
+                } if (parse_encode_data(p,line_num, data_image, DC) == 0) {
                     error_flag ++;   continue;
                 } continue;
 
@@ -168,7 +168,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                 }
-            } if (!parse_encode_string(p, line_num, data_image, DC)) {
+            } if (parse_encode_string(p, line_num, data_image, DC) == 0) {
                 error_flag ++;
             } continue;
 
@@ -180,6 +180,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
     }/*type switch*/
 }/*while loop*/
 fclose(in);
+/*movd dc size of IC*/
 if (error_flag) return 0;
-return 0;
+return 1;
 }/*funct*/
