@@ -31,4 +31,5 @@ long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_
 int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]);
 int declare_extern(Symbol_table *table, char *name);
 void move_data_symbols (Symbol_table *symbols, int ICF);
+void free_symbols(Symbol_table *symbils);
 #endif

@@ -30,15 +30,17 @@
 
 
 
-free_externs(Extern_table *externs) {
+void free_externs(Extern_table *externs) {
     Extern_symbol *curr;
     Extern_symbol *next; 
 
     curr = externs ->head; /* set curr to be the head of table */
 
-    while (externs != NULL) { /*as long as the list is not empty set its next to be the next then free (curr) then move on to the next */
+    while (curr != NULL) { /*as long as the list is not empty set its next to be the next then free (curr) then move on to the next */
         next = curr ->next;
         free(curr);
         curr = next;
     }
+    externs->head = NULL;
+    externs->tail = NULL;
 }

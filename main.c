@@ -4,10 +4,14 @@
 #include "macro.h"
 #include "macro_helpers.h"
 #include "second_pass.h"
+#include "first_pass_helper.h"
+#include "write_output_files.h"
+#include "second_pass_helper.h"
 
 int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols);
 
 int main(int argc, char *argv[]) {
+    int had_error = 0;
     int i;
     if (argc < 2) {
         printf("Proper command is this: assembler <filename>\n"); /* */
@@ -28,38 +32,48 @@ int main(int argc, char *argv[]) {
         name_length = (int)strlen(argv[i]);
         if ((name_length < 3) || strcmp(argv[i] + name_length -3, ".as") !=0) { /* check suffix .as */
             printf("Error: Filename must end with  '.as' \n");
-            continue;
+            had_error = 1;
+            goto cleanup;
         }
+
         if (name_length >= (int)sizeof(src)) {
             printf("Error: filename must not exceed 255 chars\n");
-            continue;
+            had_error = 1;
+            goto cleanup;
         }
+
         sprintf(src, "%s", argv[i]);
         sprintf(am,  "%s", argv[i]);  /* am  = "prog.am" */
         am[name_length -1] = 'm'; /* change to .as -> .am*/
         if (macro_expand(src, am, &mcro_head) == 0){ /* send src and pointer to dst */
-            continue;
+            had_error = 1;
+            goto cleanup;
         }
 
-    if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
+        if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
+            had_error = 1;
+            goto cleanup;
+        }
+        
+        if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
+            had_error = 1;
+            goto cleanup;
+        }
+        
+        if (!write_output_files(argv[1], IC,inst_image, data_image, &symbols, &externs)) {
+            had_error = 1;
+            goto cleanup;
+        }
+
+    /*reate .ob .ent .ext */
+
+    cleanup:
         free_macros(mcro_head);
-        free_symbols(symbols);
-        printf("Error:first pass errors occured\n");
-        continue; /* got errors in first pass, continue to next file*/
-    }
-    if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
-        printf("Error: occured in second pass");
-        free_macros(mcro_head);
-        free_ext(externs);
-        continue;
-    }
+        free_externs(&externs);
+        free_symbols(&symbols);
+} 
+return had_error;
+/* for loop */
 
-
-
-    /*after second pas*/
-    free_macros(mcro_head);
-    /*free_ext_int();*/ 
-    return 1;
-}
 
 }
