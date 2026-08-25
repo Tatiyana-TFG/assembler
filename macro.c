@@ -7,6 +7,7 @@
 int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
     char tmp[MAX_LINE];
     char *token;
+    int error_flag = 0;
     int line_num = 0;
     char line[MAX_LINE];
     Macro *mcro = NULL;
@@ -19,7 +20,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
     if (!in) 
     {
         printf("Error: cannot open %s\n", src);
-        return -1;
+        return 0;
     }
     /* open destination file for writing (creates it if it doesn't exist) */
     out = fopen(dst, "w");
@@ -27,7 +28,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
     {
         printf("Error: cannot create %s\n", dst);
         fclose(in);                          /* must close in before returning — otherwise the file stays locked open */
-        return -1;
+        return 0;
     }
 
 
@@ -39,6 +40,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
 
         if (line_too_long(line,in)){ /* line length check*/
             printf("Error: Line %d too long\n" , line_num);
+            error_flag++;
             continue;   
         }
             
@@ -51,7 +53,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             }
 
             if (strlen(token) >= MAX_NAME){ /*check macro name length*/
@@ -59,7 +61,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             }
             
             if (is_reserved(token) == 1)  { /* check name is not reserved and illegal*/
@@ -67,7 +69,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             }
             
             if (find_macro(mcro,token) == 1) { /*check if exists in macro table already*/ 
@@ -75,7 +77,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             }
             
             if (strtok(NULL, " \t\n") != NULL) {  /*check nothing comes after name*/ 
@@ -83,7 +85,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             
             } else { /* passed all name checks (name can be any combination of letters symbols and numbers)*/
 
@@ -94,7 +96,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 fclose(in);
                 fclose(out);
                 free_macros(mcro);
-                return -1;
+                return 0;
             }  
 
             while (fgets(line,MAX_LINE,in)!= NULL) { /*go over the line after mcro def and add cont to the table by rules below*/
@@ -104,6 +106,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
 
                 if (line_too_long(line,in)) {
                         printf("Error: Line %d too long\n" , line_num);
+                        error_flag ++;
                         continue;  
                 }
 
@@ -113,7 +116,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                         fclose(in);
                         fclose(out);
                         free_macros(mcro);
-                        return -1;
+                        return 0;
                     }
                     break; /* macroend termination */               
                 } else { 
@@ -123,7 +126,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                         fclose(in);
                         fclose(out);
                         free_macros(mcro);
-                        return -1;
+                        return 0;
                     }
 
                 }
@@ -143,6 +146,14 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
 
     fclose(in);
     fclose(out);
+    
+    if (error_flag) {
+        free_macros(mcro);
+        *mcro_head = NULL;
+        remove(dst);
+        return 0;
+    }
+
     *mcro_head=mcro;
-    return 0;
+    return 1;
 }

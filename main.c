@@ -8,12 +8,9 @@ int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_i
 
 int main(int argc, char *argv[]) {
     char src[256], am[256]; /* maybe should also be dynamic */
-    int IC = 100; /* instruction counter starts at 100 per spec */
-    int DC = 0;   /* data counter starts at 0 */
     int i;
     unsigned char data_image[IMAGE_CAPACITY];
     unsigned int inst_image[IMAGE_CAPACITY];
-    Symbol_table symbols = { NULL, NULL };   /* head, tail */
     Symbol_table externs = { NULL, NULL };
     Symbol_table entry = { NULL, NULL };
 
@@ -22,11 +19,14 @@ int main(int argc, char *argv[]) {
         return 1;
     } 
     
-    for (i = 1; i < argc; i++) {
+    for (i = 1; i < argc; i++) { /* add checks for .am in the file recived  */
+        Symbol_table symbols = { NULL, NULL };   /* head, tail */
+        int IC = 100; /* instruction counter starts at 100 per spec */
+        int DC = 0;   /* data counter starts at 0 */
         Macro *mcro_head = NULL;
-        sprintf(src, "%s.as", argv[i]);  /* src = "prog.as" */
+        sprintf(src, "%s", argv[i]);  /* src = "prog.as" */
         sprintf(am,  "%s.am", argv[i]);  /* am  = "prog.am" */
-        if (macro_expand(src, am, &mcro_head) != 0){ /* send src and pointer to dst */
+        if (macro_expand(src, am, &mcro_head) == 0){ /* send src and pointer to dst */
             continue;
         }
     if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols,&externs,&entry)!= 0){
@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
     }
         
     free_macros(mcro_head);
+    free_ext_int();
     }
    /*
 
