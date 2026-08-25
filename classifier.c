@@ -3,6 +3,7 @@
 #include "first_pass_helper.h"
 #include <stdlib.h> 
 #include <string.h>
+#include <stdio.h>
 
 int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label definition with :*/
   int len;
@@ -12,7 +13,9 @@ int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label def
   /* 1 = valid lable 
   0 = : but no lable 
   -1 = bad lable */
-
+  skip_whitespaces(&p);
+  start = p;
+  
   while (*p != '\0' && *p != '\t' && *p != '\n' && *p != ' ' && *p != ':') p++; /* find first token*/
   if (*p == ':'){ /*check if : exists*/
     len = p - start; /* counter of how many chars the token is */
@@ -44,7 +47,7 @@ line_type classify_line(char *line){
 
 directive_type classify_dir (char *line, int line_num){
   char line_copy[MAX_LINE];
-  char *token, *line_p;
+  char *token;
   strcpy(line_copy, line); /* copy original line to line copy*/
   char *line_p = line_copy; /* point at line copy */
 
@@ -52,7 +55,7 @@ directive_type classify_dir (char *line, int line_num){
   token = strtok(line_p, "\t \n"); /*point to first token*/
 
   if (token == NULL){ /* check if token exists*/
-    printf("Error: missing dirictive in line %d\n", line_num);
+    printf("Error: missing information in line %d\n", line_num);
     return BAD_DIR;
   }
 

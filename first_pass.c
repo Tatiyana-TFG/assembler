@@ -45,7 +45,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                case LINE_EMPTY:
                case LINE_COMMENT:
                 if (has_label) {
-                    printf("Error: label without statment in line %d\n", line_num);
+                    printf("Error: label without statement in line %d\n", line_num);
                     error_flag ++;
                 }
                continue;
@@ -126,6 +126,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                 if(!store_ic_value(encoded_val,IC,inst_image)){
                     printf("Error: encodig error in line %d\n",line_num);
+                    error_flag ++;
                 }
                 break;
 
@@ -157,7 +158,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     /* add a check that image data is not full*/
                 } if (!parse_encode_data(p,line_num, data_image, DC)) {
                     error_flag ++;   continue;
-                }
+                } continue;
 
 
                 case STRING:
@@ -165,8 +166,9 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
                     error_flag++; continue;
                 }
-            } /* encode the values into data_image[*DC ...]; *DC += count; */
-            continue;         
+            } if (!parse_string(p, line_num, data_image, DC)) {
+                error_flag ++;
+            } continue;
 
             case BAD_DIR:
             printf("Error: unknown line directive in line %d\n", line_num);

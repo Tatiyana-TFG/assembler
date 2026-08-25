@@ -151,7 +151,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                     continue;
                 }
             
-            print_macro(mcro,out); 
+            print_macro(found,out); 
         } else {
             fputs(line, out);
             }
