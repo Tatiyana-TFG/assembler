@@ -687,9 +687,22 @@ void move_data_symbols (Symbol_table *symbols, int ICF) {
         curr = curr ->next; /* inside while -> move to next sym*/
     }
 }
-/*
-free_symbol(){};
-*/
+
+free_symbol(Symbol_table *symbols) {
+    Symbol *curr;
+    Symbol *next; 
+
+    curr = symbols ->head; /* set curr to be the head of table */
+
+
+    while (symbols != NULL) { /*as long as the head is not empty set its next to be the next then free (curr) then move on to the next */
+        next = curr ->next;
+        free(curr);
+        curr = next;
+
+    }
+
+}
 
 /*
   - Correct .extern. - add extern function

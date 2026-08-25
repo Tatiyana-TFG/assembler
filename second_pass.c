@@ -5,6 +5,8 @@
 #include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
+#include "second_pass_helper.h"
+
 
 int second_pass(char *am, Macro *mcro_head, unsigned int *inst_image, Symbol_table *symbols, Extern_table *externs) {
 FILE *in;
@@ -105,7 +107,6 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         continue;
                     }
                     j_label = 1;
-                    continue;
                 }
 
                 /*label or reg*/
@@ -119,7 +120,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         j_label = 1;
                 }
                 if (j_label){ /*if it is a label we need to find the label and encode*/
-                    symbol = find_symbol(symbol, label_name);
+                    symbol = find_symbol(symbols, label_name);
 
                     if (symbol == NULL) {
                         printf("Error: jmp target %s is not defined in lined %d\n", label_name,line_num);
@@ -139,8 +140,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                     } else { inst_image[index] = encoder_j (operation ->opcode, 0, symbol->value);
 
                 }  
-            }
-            continue;
+            }continue;
                 
               
 

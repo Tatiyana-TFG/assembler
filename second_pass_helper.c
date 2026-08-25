@@ -5,9 +5,9 @@
 #include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
-  #include <stdlib.h>
+#include <stdlib.h>
 
-static int add_ext_use(Extern_table *externs, char *name, int address) { 
+  int add_ext_use(Extern_table *externs, char *name, int address) { 
     Extern_symbol *curr = malloc(sizeof(Extern_symbol));
 
         if (!curr){ 

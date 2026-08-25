@@ -3,6 +3,7 @@
 #include "datatypes.h"
 #include "macro.h"
 #include "macro_helpers.h"
+#include "second_pass.h"
 
 int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols);
 
@@ -46,7 +47,12 @@ int main(int argc, char *argv[]) {
         printf("Error:first pass errors occured\n");
         continue; /* got errors in first pass, continue to next file*/
     }
-    if (second_pass())
+    if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
+        printf("Error: occured in second pass");
+        free_macros(mcro_head);
+        free_ext(externs);
+        continue;
+    }
 
 
 
