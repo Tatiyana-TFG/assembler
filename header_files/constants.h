@@ -3,6 +3,7 @@
 #define CONSTANTS_H
 
 #define MAX_LINE 82
+#define MAX_FILENAME 257
 #define MAX_NAME 32
 #define IMAGE_CAPACITY 1000
 #define NUMBER_OF_OP_ELEMENTS 27

@@ -60,13 +60,15 @@ int main(int argc, char *argv[]) {
             goto cleanup;
         }
         
-        if (!write_output_files(argv[1], IC,inst_image, data_image, &symbols, &externs)) {
+        if (!write_output_files(argv[i], IC,DC,inst_image, data_image, &symbols, &externs)) {
             had_error = 1;
             goto cleanup;
         }
-
-    /*reate .ob .ent .ext */
-
+        if (write_output(src, IC ,DC ,inst_image, data_image, &symbols, &externs) == 0) {
+            had_error = 1;
+            goto cleanup;
+            
+        }
     cleanup:
         free_macros(mcro_head);
         free_externs(&externs);
