@@ -4,6 +4,7 @@
 #include "first_pass_helper.h"
 #include "datatypes.h"
 #include "macro.h"
+#include "classifier.h"
 
 /*
 * Detects an optional label definition at the beginning of a source line

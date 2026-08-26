@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
+#include "second_pass_helper.h"
 
 /*
 * Adds an external symbol use to the external symbol table
