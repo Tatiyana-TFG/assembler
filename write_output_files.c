@@ -20,19 +20,27 @@ int write_output (const char *filename, int IC,int DC, const unsigned int *inst_
     
     if (write_ob(ob_filename, IC, DC, inst_image, data_image) == 0) {
         printf ("Error: could not create %s\n", ob_filename);
+        printf("========================================\n");
         return 0;
     }
     if (write_entry(ent_filename, symbols) == 0) {
         printf ("Error: could not create %s\n", ent_filename);
+        printf("========================================\n");
+
         return 0;
 
     }
     if (write_extern(ext_filename, externs) == 0) {
         printf ("Error: could not create %s\n", ext_filename);
+        printf("========================================\n");
+
         return 0;
     }
     /*else*/
-    printf("Output processing complete for %s\n", filename);
+    
+    printf("Output processing COMPLETED for %s\n", filename);
+    printf("========================================\n");
+
     return 1;
 
 }
@@ -56,7 +64,6 @@ if (has_entry == 0) { /*if no entry exist dont create the file but return succes
 /* open file and write entries*/
 out = fopen(filename,"w");
 if (out == NULL) {
-    printf("Error: could not create file  %s\n", filename);
     return 0; 
 }
 
@@ -83,7 +90,6 @@ if (externs -> head == NULL) {
 out = fopen(filename,"w");
 
 if (out == NULL) {
-    printf("Error: could not create %s\n", filename);
     return 0;
 }
 
@@ -107,7 +113,6 @@ FILE *out;
 
     out = fopen(filename, "w"); /*open filename.ob*/
     if (out == NULL) {
-        printf("Error: could not create file %s", filename);
         return 0;
     }
 

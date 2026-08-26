@@ -2,7 +2,7 @@
 #ifndef CLASSIFIER_HELPER_H
 #define CLASSIFIER_HELPER_H
 
-int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext);
+int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext, int line_num);
 int valid_label(char *name, Macro *mcro);
 Symbol *find_symbol(Symbol_table *symbols, char *name);
 int get_operand(char *p, char *op, int line_num ,Macro *mcro_head);
@@ -29,7 +29,7 @@ int parse_encode_string(char *p, int line_num, unsigned char *data_image, int *D
 int is_valid_data_value(long value, int num_of_bytes);
 long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_count);
 int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]);
-int declare_extern(Symbol_table *table, char *name);
+int declare_extern(Symbol_table *table, char *name, int line_num);
 void move_data_symbols (Symbol_table *symbols, int ICF);
 void free_symbols(Symbol_table *symbils);
 #endif

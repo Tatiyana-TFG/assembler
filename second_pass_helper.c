@@ -7,7 +7,7 @@
 #include "first_pass_helper.h"
 #include <stdlib.h>
 
-  int add_ext_use(Extern_table *externs, char *name, int address) { 
+int add_ext_use(Extern_table *externs, char *name, int address) { 
     Extern_symbol *curr = malloc(sizeof(Extern_symbol));
 
         if (!curr){ 
@@ -27,8 +27,6 @@
         }
         return 1;
     } 
-
-
 
 void free_externs(Extern_table *externs) {
     Extern_symbol *curr;

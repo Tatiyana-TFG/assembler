@@ -95,11 +95,11 @@ Symbol *find_symbol(Symbol_table *symbols, char *name) { /*null if not found*/
         return NULL;
     } 
 
-int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext) { /*success added on 1*/
+int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext, int line_num) { /*success added on 1*/
     if (find_symbol(table,name) == 0){
         Symbol *curr = malloc(sizeof(Symbol));
         if (!curr){ 
-            printf("Error: cannot allocate space for '%s',\n",name);
+            printf("Error: cannot allocate space for '%s' in line %d,\n",name, line_num);
             return 0;
         } 
            
@@ -117,21 +117,21 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
             table->tail = curr;/* then set the tail to point at the last added node*/
         }
         return 1;
-    } printf("Error: symbol '%s' already defined\n", name);
+    } printf("Error: symbol '%s' in line %d already defined\n", name, line_num);
     return 0; /* 0 for not added */
 }
 
-int declare_extern(Symbol_table *table, char *name){
+int declare_extern(Symbol_table *table, char *name, int line_num){
 Symbol *found;
 found = find_symbol (table, name);
     if (found == NULL) {
-        return add_symbol(table,name,0,0,0,0,1);
+        return add_symbol(table,name,0,0,0,0,1, line_num);
     } else {
         if (found->is_ext == 0) {  /*check if name is an extern attribute */
-            printf("Error: name '%s' is already declered and not as an exter\n", name);
+            printf("Error: name '%s'  in line %d is already declered and not as an extern\n", name, line_num);
             return 0;
         } else{
-            printf("Extern %s already defined (no error)\n" , name);
+            printf("Extern %s in line %d is already defined (no error)\n" , name, line_num);
             return 1;
         }
            
