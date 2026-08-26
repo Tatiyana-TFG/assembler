@@ -5,6 +5,11 @@
 #include <string.h>
 #include <stdio.h>
 
+/*
+* Detects an optional label definition at the beginning of a source line
+* Copies the label name to name and advances line past the label
+* Returns 1 for a valid label 0 when no label exists and -1 for an invalid label
+*/
 int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label definition with :*/
   int len;
   char line_copy[MAX_LINE];
@@ -46,6 +51,10 @@ int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label def
   return 0; /* : exists but no label */
 }
 
+/*
+* Classifies a line as empty, a comment, directive or an
+* instruction according to its first meaningful character
+*/
 line_type classify_line(char *line){
   while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
   if (*line == '\0' || *line == '\n') return LINE_EMPTY;
@@ -55,6 +64,10 @@ line_type classify_line(char *line){
       
 }
 
+/*
+* Identifies the directive at the beginning of a line
+* Returns the matching directive type or BAD_DIR for an invalid directive
+*/
 directive_type classify_dir (char *line, int line_num){
   char line_copy[MAX_LINE];
   char *token, *line_p;
