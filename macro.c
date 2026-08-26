@@ -3,11 +3,10 @@
 #include "datatypes.h"
 #include "macro_helpers.h"
 #include "macro.h"
-
 /*
 * Expands macro definitions and macro calls from src into the intermediate
-* file dst. Stores the resulting macro table in mcro_head.
-* Returns 1 on success and 0 if an input, output, or macro error occurs.
+* file dst Stores the resulting macro table in mcro_head
+* Returns 1 on success and 0 if an input output or macro error occurs
 */
 
 int macro_expand(const char *src, const char *dst, Macro **mcro_head) {

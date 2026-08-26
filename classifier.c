@@ -1,9 +1,9 @@
-#include "first_pass_helper.h"
-#include "datatypes.h"
-#include "macro.h"
 #include <stdlib.h> 
 #include <string.h>
 #include <stdio.h>
+#include "first_pass_helper.h"
+#include "datatypes.h"
+#include "macro.h"
 
 /*
 * Detects an optional label definition at the beginning of a source line
@@ -18,9 +18,9 @@ int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label def
   char *start =  *line; /*point to the same place line points to*/
   char *p= *line; /*point to the same place line points to*/
 
-  /* 1 = valid lable 
-  0 = : but no lable 
-  -1 = bad lable */
+  /* 1 means valid label
+  0 means no label
+  -1 means invalid label */
   skip_whitespaces(&p);
   start = p;
   
@@ -56,7 +56,7 @@ int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label def
 * instruction according to its first meaningful character
 */
 line_type classify_line(char *line){
-  while (*line == ' ' || *line == '\t') line++; /* skip whitespaces*/
+  while (*line == ' ' || *line == '\t') line++;
   if (*line == '\0' || *line == '\n') return LINE_EMPTY;
   if (*line == ';') return LINE_COMMENT;
   if (*line == '.')  return LINE_DIRECTIVE;
@@ -74,7 +74,7 @@ directive_type classify_dir (char *line, int line_num){
   strcpy(line_copy, line); /* copy original line to line copy*/
   line_p = line_copy; /* point at line copy */
 
-  while (*line_p == ' ' || *line_p == '\t') line_p++; /* skip whitespaces*/
+  while (*line_p == ' ' || *line_p == '\t') line_p++;
   token = strtok(line_p, "\t \n"); /*point to first token*/
 
   if (token == NULL){ /* check if token exists*/

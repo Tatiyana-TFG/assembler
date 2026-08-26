@@ -5,7 +5,7 @@
 #include "constants.h"
 #include "macro_helpers.h"
 
-
+/* Operation table used to identify instructions and their encoding format*/
 static const Operation operation_info[] = {
 /* R: register, register, register */
     {"add",   0,  1, 'R', THREE_REG},
@@ -47,15 +47,19 @@ static const Operation operation_info[] = {
     {"hlt",  63, -1, 'J', NO_OPERANDS}
   };
 
+/*
+ * Finds an operation by its name
+ * Advances the line pointer past the operation name
+ * Returns the operation information or NULL
+ */
 const Operation *find_op(char **line){
     char *p = *line;
     int i;
     char *tok;
     int const op_elements = NUMBER_OF_OP_ELEMENTS; 
     char *line_end = p + strlen(p);
-    /* skip whitespaces*/
     while (*p== ' ' || *p== '\t') p++;
-    tok = strtok(p,"\t \n"); /* get the operatation name into token and compare in while loop*/
+    tok = strtok(p,"\t \n"); /* Get the operation name */
     if (tok == NULL)
         return NULL;
     p = tok + strlen(tok); /* go past the operation name*/ 
@@ -66,10 +70,15 @@ const Operation *find_op(char **line){
         if (strcmp(tok,operation_info[i].name)==0){ /* find the array element with the operation name*/
             return &operation_info[i]; /*returns the array element*/
         }
-    }   return NULL; /* return null pointer if dosent exist*/
+    }   return NULL; /* Return NULL when the operation is unknown */
 
 }
 
+/*
+ * Checks whether a label follows the naming rules
+ * Rejects reserved words and macro names
+ * Returns 1 for a valid label and 0 otherwise
+ */
 int valid_label(char *name, Macro *mcro){ /*1 valid -  0 invalid*/
 char *p;
 if (!((name[0] >= 'a' && name[0] <= 'z') || (name[0]>= 'A' && name [0]<='Z')))
@@ -85,6 +94,10 @@ if (!is_reserved(name)){
     } return 0;
 }
 
+/*
+ * Searches the symbol table for a matching name
+ * Returns the matching symbol or NULL when it is not found
+ */
 Symbol *find_symbol(Symbol_table *symbols, char *name) { /*null if not found*/
         Symbol *p = symbols ->head;
         while (p != NULL){
@@ -95,6 +108,11 @@ Symbol *find_symbol(Symbol_table *symbols, char *name) { /*null if not found*/
         return NULL;
     } 
 
+/*
+ * Creates a new symbol and adds it to the symbol table
+ * Stores its address and its symbol attributes
+ * Returns 1 when successful and 0 on failure
+ */
 int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int ent, int ext, int line_num) { /*success added on 1*/
     if (find_symbol(table,name) == 0){
         Symbol *curr = malloc(sizeof(Symbol));
@@ -121,6 +139,11 @@ int add_symbol(Symbol_table *table,char *name, int value, int code, int dat, int
     return 0; /* 0 for not added */
 }
 
+/*
+ * Declares a name as an external symbol
+ * Allows repeated declarations of the same external symbol
+ * Rejects names already used by regular symbols
+ */
 int declare_extern(Symbol_table *table, char *name, int line_num){
 Symbol *found;
 found = find_symbol (table, name);
@@ -128,7 +151,7 @@ found = find_symbol (table, name);
         return add_symbol(table,name,0,0,0,0,1, line_num);
     } else {
         if (found->is_ext == 0) {  /*check if name is an extern attribute */
-            printf("Error: name '%s'  in line %d is already declered and not as an extern\n", name, line_num);
+            printf("Error: name '%s'  in line %d is already declared and not as an extern\n", name, line_num);
             return 0;
         } else{
             printf("Extern %s in line %d is already defined (no error)\n" , name, line_num);
@@ -139,6 +162,11 @@ found = find_symbol (table, name);
 
  }
 
+/*
+ * Reads one label operand from a directive
+ * Validates the operand and copies it to the output buffer
+ * Rejects missing operands and extra text
+ */
 int get_operand(char *p, char *op, int line_num, Macro *mcro_head) {
 char *tok;
 char *extra;
@@ -171,9 +199,13 @@ strcpy(op, tok); /*copy for caller function*/
 return 1;
 }
 
+/*
+ * Checks that no unexpected characters remain in the line
+ * Returns 1 when the line ends correctly and 0 otherwise
+ */
 int check_end (char **p, int line_num){
     if (**p != '\n' && **p != '\0' ){
-        printf("Error: execess elemnts after last register in line %d \n ", line_num);
+        printf("Error: extra elements after the last register in line %d \n ", line_num);
         return 0;
     }
     return 1;
@@ -186,6 +218,11 @@ int skip_whitespaces(char **p) {
     return 1;
 }
 
+/*
+ * Checks that the current character is a comma
+ * Advances the pointer when a comma is found
+ * Returns 1 when successful and 0 otherwise
+ */
 int is_comma(char **p, int line_num){
 
     if (**p== ','){
@@ -196,6 +233,11 @@ int is_comma(char **p, int line_num){
     return 0;
 }
 
+/*
+ * Reads a register number from the current position
+ * Accepts register numbers from 0 through 31
+ * Stores the result in reg
+ */
 int read_reg(char **p, int *reg, int line_num){
 int value = 0;
     if (**p != '$'){ /* check symbol is $ */
@@ -229,6 +271,11 @@ int value = 0;
 
 }
 
+/*
+ * Reads a signed decimal immediate value
+ * Checks that the value fits in the signed 16 bit range
+ * Stores the result in num
+ */
 int read_imd (char **p, int *num, int line_num){
     int sign = 1;
     long value = 0;
@@ -277,13 +324,18 @@ int read_imd (char **p, int *num, int line_num){
 
 }
 
-int read_label(char **p, char *label,int line_num, Macro *mcro_head){/* check if it is a lable name without :*/
+/*
+ * Reads one label operand from the current position
+ * Validates the label name and stores it in label
+ * Rejects invalid names and unexpected extra text
+ */
+int read_label(char **p, char *label,int line_num, Macro *mcro_head){/* Read a label without a colon */
 int len;
 char *start =  *p; /*point to the same place line points to*/
 char *pp= *p; /*point to the same place line points to*/
 
-/* 1 = valid lable 
-0 = bad lable */
+/* 1 means valid label
+0 means invalid label */
 
 while (*pp != '\0' && *pp != '\t' && *pp != '\n' && *pp != ' ') pp++; /* find first token*/
 len = pp - start; /* counter of how many chars the token is */
@@ -310,8 +362,13 @@ if (!check_end(&pp, line_num))
 return 1;
 }
 
+/*
+ * Parses three register operands
+ * Checks the required commas and the end of the line
+ * Stores the registers in rs rt and rd
+ */
 int parse_three_regs(char *p, int *rs, int *rt, int *rd, int line_num){
-/*skip whitespaces -> check reg (including $ and valid number) -> skipws before and after comma -> check comma -> read register ...*/
+/* Read each register and check the separators */
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
     return 0;
@@ -333,6 +390,11 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
+/*
+ * Parses two register operands
+ * Checks the required comma and the end of the line
+ * Stores the registers in rs and rd
+ */
 int parse_two_regs(char *p, int *rs, int *rd, int line_num){
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
@@ -349,6 +411,11 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
+/*
+ * Parses a register an immediate value and a register
+ * Stores the results in rs imd and rt
+ * Checks operand separators and the end of the line
+ */
 int parse_reg_number_reg(char *p, int *rs, int *imd, int *rt, int line_num ){
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
@@ -371,6 +438,11 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
+/*
+ * Parses two registers followed by a label
+ * Stores the registers and label in the supplied output values
+ * Checks operand separators and the end of the line
+ */
 int parse_two_regs_label(char *p, int *rs, char *label, int *rt, int line_num, Macro *macro_head ){
 skip_whitespaces(&p);
 if (!read_reg(&p,rs,line_num))
@@ -393,6 +465,11 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
+/*
+ * Parses an operand that may be a register or a label
+ * Sets reg_flag when the operand is a register
+ * Stores the parsed value in the matching output variable
+ */
 int parse_label_or_reg(char *p, int *address_or_reg, char *label,int *reg_flag, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
 if (*p == '$') { /* should there be a register?*/
@@ -416,6 +493,10 @@ return 1;
 
 }
 
+/*
+ * Parses one label operand
+ * Validates the label and checks that no extra text remains
+ */
 int parse_label(char *p, char *label, int line_num, Macro *macro_head){
 skip_whitespaces(&p);
 if (!read_label(&p,label,line_num, macro_head))
@@ -426,11 +507,20 @@ if (!check_end(&p, line_num))
 return 1;
 }
 
+/*
+ * Checks that the hlt instruction has no operands
+ * Returns 1 when the line ends after the instruction
+ */
 int validate_hlt(char *p,int line_num){
 skip_whitespaces(&p);
 return check_end(&p,line_num);
 }
 
+/*
+ * Parses a data directive and its numeric operands
+ * Validates the values according to the directive size
+ * Encodes the values into the data image
+ */
 int parse_encode_data(char *p, int line_num, unsigned char *data_image, int *DC){ 
 long *data_op_array;
 int data_array_count = 0;
@@ -438,7 +528,7 @@ char *line_end;
 char *token;
 int success;
 
-skip_whitespaces(&p); /* skip whitespaces*/
+skip_whitespaces(&p);
 line_end = p + strlen(p); /* point to last \0*/
 token = strtok(p, "\t \n"); 
 if (token == NULL) {
@@ -457,7 +547,7 @@ if (*p == '\0' || *p == '\n') {
     return 0;
   }
 
-/*function checks directive name -> calls op_loop -> op loop reads num and validates -> allocates mem and returns*/
+/* Validate directive values and encode them in the data image */
 if (strcmp(token, ".db")==0){
     data_op_array = is_valid_op_loop(p,line_num,1 , &data_array_count);
     if (data_op_array == NULL){
@@ -496,6 +586,10 @@ return 0;
 
 }
 
+/*
+ * Checks whether a value fits in the requested number of bytes
+ * Returns 1 for a valid value and 0 otherwise
+ */
 int is_valid_data_value(long value, int num_of_bytes){ /* checks value between signed minimum and unsigned max for each data*/
 
     if (num_of_bytes ==1)
@@ -511,6 +605,11 @@ int is_valid_data_value(long value, int num_of_bytes){ /* checks value between s
     
 }
 
+/*
+ * Reads all numeric operands of a data directive
+ * Validates the values and stores them in a dynamic array
+ * Returns the array or NULL when an error occurs
+ */
 long *is_valid_op_loop(char *p, int line_num, int num_of_bytes, int *data_array_count){ /* function walks the line as long as not the end and checks each number then stores it */
 long value;
 char *end;
@@ -532,14 +631,14 @@ while (*p != '\0' && *p != '\n'){
     free(data_array);
     return NULL;
 }
-    temp = realloc (data_array, (*data_array_count +1 ) * sizeof(long)); /*realoc space for new number*/
+    temp = realloc (data_array, (*data_array_count +1 ) * sizeof(long)); /* Resize the value array */
 
     if (temp == NULL){
         printf("Error: cannot allocate memory in line %d\n",line_num); /*fail*/
         free(data_array);
         return NULL;
     }
-    data_array = temp; /* put reall*/
+    data_array = temp; /* Use the resized array */
     data_array[*data_array_count] = value; 
     (*data_array_count) ++ ;
 
@@ -567,6 +666,11 @@ while (*p != '\0' && *p != '\n'){
 
 } 
 
+/*
+ * Parses an asciz string operand
+ * Checks the quotation marks and printable ASCII characters
+ * Stores the string and its terminating zero in the data image
+ */
 int parse_encode_string(char *p, int line_num, unsigned char *data_image, int *DC){ 
 char *token, *line_end, *pp, *string_end, *string_start;
 int  string_length;
@@ -594,13 +698,13 @@ string_start = pp;
 
 while (*pp != '"' && *pp != '\n' && *pp != '\0'){/* check all are printable asciz chars and skip them*/
     if ((unsigned char) *pp < 32 || (unsigned char) *pp > 126){      /* printable ASCII values*/
-        printf("Error: string containts non printable ASCII chars in line %d\n", line_num);
+        printf("Error: string contains non printable ASCII chars in line %d\n", line_num);
         return 0;
     }
     pp++;
 } 
 
-if (*pp != '"'){ /*closing char dosent exist*/
+if (*pp != '"'){ /* The closing quote is missing */
     printf("Error: missing closing quotes in line %d\n", line_num);
     return 0;
 }
@@ -622,7 +726,7 @@ if(string_length + 1 > IMAGE_CAPACITY - (*DC)) {
     return 0;
 }
 
-/* loop from string start length of string length and each char put into data image */
+/* Copy the string characters into the data image */
 while (string_start < string_end ){
     data_image[*DC] = *string_start; /* insert char value to data image*/
     (*DC) ++; /*advance DC counter*/
@@ -634,7 +738,12 @@ data_image[*DC] = '\0'; /* null term at the end of asciz*/
 return 1;
 }
 
-/*all encoders work the same -> move bits to designated position by bitwise operatoes */
+/* Encoders place each instruction field in its specified bit position */
+/*
+ * Encodes an R instruction
+ * Places the opcode registers and function code in their bit fields
+ * Returns the encoded instruction word
+ */
 unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
@@ -646,6 +755,11 @@ unsigned int encoder_r(int opcode,int rs,int rt,int rd, int funct){
     return inst_value;
 }
 
+/*
+ * Encodes an I instruction
+ * Places the opcode registers and immediate value in their bit fields
+ * Keeps only the 16 bits of the immediate field
+ */
 unsigned int encoder_i(int opcode, int rs, int rt, int immed){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
@@ -656,6 +770,11 @@ unsigned int encoder_i(int opcode, int rs, int rt, int immed){
     return inst_value;
 }
 
+/*
+ * Encodes a J instruction
+ * Places the opcode register flag and address in their bit fields
+ * Keeps only the 25 bits of the address field
+ */
 unsigned int encoder_j(int opcode, int reg_flag, int address){
     unsigned int inst_value =0;
     inst_value |= (unsigned)opcode << 26;
@@ -665,6 +784,11 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
     return inst_value;
 }
 
+/*
+ * Encodes validated data values into the data image
+ * Writes each value one byte at a time in little endian order
+ * Returns 0 when the image has insufficient capacity
+ */
 int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC, int line_num){ /* from MSB byte <- LSB to LSB byte <- MSB*/
     int byte_ind, i;
     unsigned long value;
@@ -679,7 +803,7 @@ int encode_data(const long *data_op_array, int data_array_count, int num_of_byte
     for (i = 0; i < data_array_count; i ++){ /* how many numbers we have? */
         value = (unsigned long)data_op_array[i];
 
-        for (byte_ind = 0; byte_ind < num_of_bytes; byte_ind ++){ /* what size are these numbers? iterate number of bytes and insert into data image in little endian*/
+        for (byte_ind = 0; byte_ind < num_of_bytes; byte_ind ++){ /* Write the least significant byte first for little endian storage */
             data_image[*DC] = (unsigned char) ((value >> (byte_ind *8)) & 0xFFUL); /* shift the byte to the right (each byte is shifter a diff amount) and mask the rightmost byte and insert into image*/
             (*DC) ++; /* advance to the next DC per byte each time since we read a byte at a time*/
         }
@@ -687,6 +811,11 @@ int encode_data(const long *data_op_array, int data_array_count, int num_of_byte
     return 1;
 }
 
+/*
+ * Stores an encoded instruction in the instruction image
+ * Calculates the array index from the current instruction address
+ * Advances the instruction counter by four bytes
+ */
 int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[]){
     int index;
     index = (*IC - 100) / 4;
@@ -698,6 +827,10 @@ int store_ic_value(unsigned int encoded_val, int *IC, unsigned int inst_image[])
     return 1;
 }
 
+/*
+ * Adjusts data symbol addresses after the instruction image is complete
+ * Places every data symbol after the final instruction address
+ */
 void move_data_symbols (Symbol_table *symbols, int ICF) {
     Symbol *curr;
     curr = symbols -> head;
@@ -709,6 +842,10 @@ void move_data_symbols (Symbol_table *symbols, int ICF) {
     }
 }
 
+/*
+ * Releases all nodes in the symbol table
+ * Resets the table to an empty state
+ */
 void free_symbols(Symbol_table *symbols) {
     Symbol *curr;
     Symbol *next; 
@@ -724,12 +861,3 @@ void free_symbols(Symbol_table *symbols) {
     symbols->head = NULL;
     symbols->tail = NULL;
 }
-
-/*
-  - Correct .extern. - add extern function
-  - Defer or properly record .entry. - what do we need to do here?
-  - Stop DATA from falling through into STRING.
-  - Add free all dynamicly allocated storage at fail or done
-  - Add final IC to every data symbol address.
-  - Second pass
-    */

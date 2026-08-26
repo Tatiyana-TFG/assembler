@@ -10,6 +10,11 @@
 
 int first_pass(char *am, Macro *mcro_head, int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols);
 
+/*
+* Processes every input file through macro expansion and both assembler passes
+* Creates the requested output files
+* Returns 0 when all files succeed and 1 when an error occurs
+*/
 int main(int argc, char *argv[]) {
     int had_error = 0;
     int i;

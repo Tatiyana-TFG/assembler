@@ -4,6 +4,12 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <stdio.h>
+/*
+* Performs the first assembler pass
+* Validates syntax calculates instruction and data sizes builds the symbol
+* table and encodes instructions and data that do not require label values
+* Returns 1 on success and 0 if any source or image-capacity error occurs
+*/
 
 int first_pass(char *am,Macro *mcro_head,int *IC,int *DC, unsigned int *inst_image, unsigned char *data_image, Symbol_table *symbols) {
 
@@ -23,7 +29,7 @@ int error_flag = 0;
 unsigned int encoded_val;
 const Operation *operation;
 
-/* open am file for reading after macro expension*/
+/* Open the macro expanded intermediate file for the first pass */
 in = fopen(am,"r");
 if (in == NULL){
     printf("Error: cannot open %s\n", am); 
@@ -172,10 +178,10 @@ while (fgets(line,MAX_LINE,in) != NULL){
     }/*type switch*/
 }/*while loop*/
 fclose(in);
-/*movd dc size of IC*/
+/* Data symbols are adjusted after the final instruction address is known */
 if (error_flag) return 0;
 
-/*if first pass was successful move data +icf*/
+/* Move data symbols after the final IC is known */
 move_data_symbols(symbols, *IC);
 return 1;
 

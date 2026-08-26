@@ -1,12 +1,17 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "second_pass.h"
 #include "datatypes.h"
 #include "constants.h"
 #include "classifier.h"
 #include "first_pass_helper.h"
-#include <stdlib.h>
 
+/*
+* Adds an external symbol use to the external symbol table
+* Stores the symbol name and the instruction address
+* Returns 1 when successful and 0 when memory allocation fails
+*/
 int add_ext_use(Extern_table *externs, char *name, int address) { 
     Extern_symbol *curr = malloc(sizeof(Extern_symbol));
 
@@ -28,6 +33,10 @@ int add_ext_use(Extern_table *externs, char *name, int address) {
         return 1;
     } 
 
+/*
+* Releases every node in the external symbol table
+* Resets the table to an empty state
+*/
 void free_externs(Extern_table *externs) {
     Extern_symbol *curr;
     Extern_symbol *next; 

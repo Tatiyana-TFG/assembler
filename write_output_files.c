@@ -6,6 +6,11 @@
 #include "second_pass_helper.h"
 #include "write_output_files.h"
 
+/*
+* Creates the object entry and external output files
+* Uses the instruction image data image symbol table and external table
+* Returns 1 when all output files are written successfully
+*/
 int write_output (const char *filename, int IC,int DC, const unsigned int *inst_image, const unsigned char *data_image, const Symbol_table *symbols, const Extern_table *externs){
     char ob_filename [MAX_FILENAME];
     char ent_filename [MAX_FILENAME];
@@ -45,6 +50,10 @@ int write_output (const char *filename, int IC,int DC, const unsigned int *inst_
 
 }
 
+/*
+* Writes all symbols marked as entry symbols
+* Removes an old entry file when no entry symbols exist
+*/
 int write_entry(const char *filename, const Symbol_table *symbols) {
 const Symbol *curr;
 int has_entry;
@@ -62,7 +71,7 @@ if (has_entry == 0) { /*if no entry exist dont create the file but return succes
     remove(filename); /* if in the second run we have the same filename but no entry - entry file must be deleted*/
     return 1;
 }
-/* open file and write entries*/
+/* Open the entry file and write entry symbols */
 out = fopen(filename,"w");
 if (out == NULL) {
     return 0; 
@@ -80,6 +89,10 @@ return 1; /*printed ents*/
 
 }
 
+/*
+* Writes every recorded external symbol use
+* Removes an old external file when no external symbols were used
+*/
 int write_extern(const char *filename , const Extern_table *externs) {
 Extern_symbol *curr;
 FILE *out;
@@ -88,7 +101,7 @@ if (externs -> head == NULL) {
     remove(filename); /* if in second run file name is the same and exten is emtpy then file must not exist */
     return 1; /* no externs we return success*/
 }
-/*open file and write externs */
+/* Open the external file and write external uses */
 out = fopen(filename,"w");
 
 if (out == NULL) {
@@ -106,6 +119,11 @@ return 1;
 
 }
 
+/*
+* Writes the instruction count and data count
+* Writes encoded instructions and data with their memory addresses
+* Stores instruction bytes in little endian order
+*/
 int write_ob(const char *filename, int IC , int DC, const unsigned int inst_image[], const unsigned char data_image[]){
 int instruction_count;
 int i, j;
@@ -121,7 +139,7 @@ FILE *out;
     instruction_count = (IC - 100)/4 ; /*how many 4 bytes of instructions in the image*/
     fprintf(out, "%d %d\n", IC - 100, DC);
 
-    /* loop through instructions and print IC value -> inside loop throguh each line*/
+    /* Write every instruction with its address and four little endian bytes */
     for (i=0; i< instruction_count; i++){
         fprintf(out,"%04d", 100 + (i * 4)); /* add number of bytes to 100 to get IC */
         
@@ -133,10 +151,10 @@ FILE *out;
         }
         fprintf(out,"\n");
     }
-    /*print data image four bytes per line*/
+    /* Write data after the instruction image using the final IC address */
 
     for(i = 0; i< DC; i+=4){
-        fprintf(out,"%04d", IC +i); /* printinf from last IC address + size of first data */
+        fprintf(out,"%04d", IC +i); /* Print data addresses after the final IC */
             for(j = 0; j < 4 && i +j < DC; j++) { /* Print at most four bytes without passing the end of the final data row */
                 fprintf(out," %02X", (unsigned int)data_image [i+j]);
             }
@@ -147,6 +165,10 @@ FILE *out;
     }
     return 1;
 }
+/*
+* Removes the object entry and external files for a source file
+* Used when assembly fails
+*/
 void remove_output_files(const char *filename){ 
 /* function creates filenames.ob .ent .ext and deletes them*/
 char ob[MAX_FILENAME];

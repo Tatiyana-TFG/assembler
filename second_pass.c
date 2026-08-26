@@ -7,7 +7,12 @@
 #include "first_pass_helper.h"
 #include "second_pass_helper.h"
 
-
+/*
+* Performs the second assembler pass
+* Resolves labels calculates branch distances and marks entry symbols
+* Records external symbol uses for the external output file
+* Returns 1 on success and 0 when an error occurs
+*/
 int second_pass(char *am, Macro *mcro_head, unsigned int *inst_image, Symbol_table *symbols, Extern_table *externs) {
 FILE *in;
 char line[MAX_LINE];
@@ -15,7 +20,10 @@ char label_name[MAX_NAME];
 char op [MAX_NAME];
 char *p;
 int line_num;
-int rs,rt, distance, index, inst_addr;
+int rs,rt;
+int distance;
+int index;
+int inst_addr;
 int curr_ic;
 int has_label;
 int error_flag;
@@ -32,7 +40,7 @@ line_num = 0;
 curr_ic = 100;
 error_flag = 0;
 
-/*open file*/
+/* Open the macro expanded file for the second pass */
 in = fopen(am, "r");
 
 if (in == NULL) {
@@ -72,8 +80,8 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 error_flag++;
                 continue;
                }
-               /* branching I operation */
-                if (operation -> operands_type == TWO_REGS_LABEL) { /* will handel branch operands here */
+               /* Resolve branch labels and encode the relative branch distance */
+                if (operation -> operands_type == TWO_REGS_LABEL) { /* Resolve branch operands here */
                     if (!parse_two_regs_label (p,&rs, label_name, &rt, line_num,mcro_head)){
                         error_flag++;
                         continue;
@@ -89,14 +97,14 @@ while (fgets(line,MAX_LINE,in) != NULL){
                         error_flag++;
                         continue;
                     }
-                    distance = symbol->value -inst_addr; /* find the distnace the action needs to use*/
+                    distance = symbol->value -inst_addr; /* Distance is measured in bytes from the branch instruction */
                     
                     if (distance < BRANCH_DISTANCE_MIN || distance > BRANCH_DISTANCE_MAX) {
                         printf("Error: branch distance is out of range in line %d\n", line_num); /*check bounds for distance*/
                         error_flag++;
                         continue;
                     }
-                    index = ((inst_addr - 100)/4); /*find the indext for the inst to encode full instruction*/
+                    index = ((inst_addr - 100)/4); /* Find the instruction image index */
                     inst_image[index] = encoder_i(operation ->opcode, rs, rt, distance);
                     continue;
                     }
@@ -129,7 +137,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                     }
                     index = ((inst_addr - 100))/4; /* get the address that we need to encode*/
-                    if (symbol -> is_ext) { /* encode 0 in the j addr field*/
+                    if (symbol -> is_ext) { /* External addresses are encoded as zero and written to the ext file */
                         inst_image[index] = encoder_j(operation ->opcode, 0,0);
                         
                         if (add_ext_use(externs, label_name, inst_addr) ==0){/*record where external was used*/
