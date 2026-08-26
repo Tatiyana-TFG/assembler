@@ -15,13 +15,13 @@ int write_output (const char *filename, int IC,int DC, const unsigned int *inst_
     sprintf(ent_filename, "%.*s.ent", length - 3, filename);
     sprintf(ext_filename, "%.*s.ext", length - 3, filename);
     
-    if (!write_object_file(ob_filename, IC, DC, inst_image, data_image))
+    if (write_ob_file(ob_filename, IC, DC, inst_image, data_image) == 0)
         return 0;
     
-    if (!write_entry_file(ent_filename, symbols))
+    if (write_entry_file(ent_filename, symbols) == 0)
         return 0;
 
-    if (!write_extern_file(ext_filename, externs))
+    if (write_extern_file(ext_filename, externs) == 0)
         return 0;
 
     return 1;
@@ -29,6 +29,40 @@ int write_output (const char *filename, int IC,int DC, const unsigned int *inst_
 
 int write_entry(const char *filename, const Symbol_table *symbols);
 int write_extern(const char *filename , const Extern_table *externs);
-int write_ob(const char *filename, int IC , int DC, const unsigned int inst_image[], const unsigned char data_image[]);
+
+int write_ob_file(const char *filename, int IC , int DC, const unsigned int inst_image[], const unsigned char data_image[]){
+int instruction_count;
+int i, j;
+unsigned int word;
+unsigned int byte;
+FILE *out;
+
+    
+    out = fopen(filename, "w"); /*open filename.ob*/
+    if (out == NULL) {
+        printf("Error: cannot open file %s", filename);
+        return 0;
+    }
+    
+    instruction_count = (IC - 100)/4 ;
+    fprintf(out, "%d %d\n", IC - 100, DC);
+
+    /* loop through instructions and print IC value -> inside loop throguh each line*/
+    for (i=0; i< instruction_count; i++){
+        fprintf(out,"%04d", 100 + (i * 4)); /* add number of bytes to 100 to get IC */
+        
+        word = inst_image[i]; /*hold 32 encoded bits*/
+
+        for(j = 0; j < 4; j++) {/*print each byte in hex in little endian */
+            byte = (word >> (j*8) & 0xFFU); /*shift selected byte and mask to get only the byte (mask is 1 in 8 bits) */
+            fprintf(out, " %02X", byte);
+        }
+        fprintf(out,"\n");
+    }
+    /*print data image four bytes per line*/
+
+    for(i = 0; i< DC; i+=4);{
+        fprintf(out,"%04d", IC +i); /* printinf from */
+    }
 
 }
