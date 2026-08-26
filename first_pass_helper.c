@@ -231,29 +231,46 @@ int value = 0;
 
 int read_imd (char **p, int *num, int line_num){
     int sign = 1;
-    int value = 0;
+    long value = 0;
+    int digit;
 
     if (**p == '-'){ /* sign exists go past it*/
         sign = -1;
         (*p)++;
     }
-    if (**p == '+') /* sign exists go past it*/
+    else if (**p == '+') /* sign exists go past it*/
         (*p)++;
 
-    if ( **p <'0' || **p >'9'){ /*check num is digit*/
+    if ( **p <'0' || **p >'9'){ /*check it is digit*/
         printf("Error: Invalid immed in line %d \n", line_num);
         return 0;
     }
 
-    while (**p >= '0' && **p <= '9'){
-        value = value *10 + (**p - '0'); /* get the int number*/
-        (*p)++;
+    while (**p >= '0' && **p <= '9'){ /*loop through conver char to int */
+        digit = **p - '0'; 
+        value = value * 10L + digit; /* add each digit to curr value*/
+
+        if (sign == -1) { /* check that with each added digit we dont get out of range */
+            if (value > (long)IMMEDIATE +1L) { /* if value is bigger than 32768 it will be out of range for the immed min*/
+                printf("Error: immed in line %d is out of range \n", line_num);
+                return 0;
+            }
+        }else {
+            if (value > (long)IMMEDIATE) {
+                printf("Error: immed in line %d is out of range \n", line_num);
+                return 0;
+            }
+        }
+
+        (*p)++; 
     }
 
     value *= sign; /*apply sign*/
 
-    if (value < -32768 || value > 32767)
-        return 0; /*check 16 bit range*/
+    if (value < -((long)IMMEDIATE +1) || value > IMMEDIATE) { /*bounds between -32768 to 32767*/
+        printf("Error: immed is out of range in line %d\n", line_num);
+        return 0;
+    }
 
     *num = value;
     return 1;

@@ -53,7 +53,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                case LINE_INSTRUCTION:
                if (has_label){ /*-1 case handled in line 32*/
-                    if(add_symbol(symbols,label_name, *IC,1,0,0,0)==0){
+                    if(add_symbol(symbols,label_name, *IC,1,0,0,0,line_num)==0){
                         error_flag++; continue; /* need to add error print?*/
                     }
                }
@@ -136,7 +136,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                switch (dt){
                 case EXTERN:
                 if (get_operand(p,op,line_num, mcro_head)){
-                    if(declare_extern(symbols,op)==0){ 
+                    if(declare_extern(symbols,op,line_num)==0){ 
                         error_flag++; continue;
                     } continue;
                 }printf("Error: opernad name not leagl\n");
@@ -145,17 +145,9 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 case ENTRY: 
                 continue;
 
-                /* entry code to use later if (get_operand(p,op)){
-                    if(add_symbol(entry,op, 0,0,0,1,0)==0){
-                        error_flag++; continue;
-                    } continue;
-                } printf("Error: opernad name not leagl\n");
-                error_flag++;*/
-            
-
                 case DATA:
                 if (has_label) {
-                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
+                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0,line_num) == 0) {
                     error_flag++; continue;
                     }
                     /* add a check that image data is not full*/
@@ -165,7 +157,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
 
                 case STRING:
                 if (has_label) {
-                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0) == 0) {
+                    if (add_symbol(symbols, label_name, *DC, 0,1,0,0,line_num) == 0) {
                     error_flag++; continue;
                 }
                 } if (parse_encode_string(p, line_num, data_image, DC) == 0) {
