@@ -1,4 +1,4 @@
-assembler: macro.o macro_helpers.o first_pass.o first_pass_helper.o second_pass.o second_pass_helper.o write_output_files.c classifier.o main.o
+assembler: macro.o macro_helpers.o first_pass.o first_pass_helper.o second_pass.o second_pass_helper.o write_output_files.o classifier.o main.o
 	gcc -pedantic -ansi -Wall -Iheader_files macro.o macro_helpers.o first_pass.o first_pass_helper.o second_pass.o second_pass_helper.o write_output_files.o classifier.o main.o -o assembler
 macro.o: macro.c header_files/datatypes.h header_files/macro_helpers.h header_files/macro.h
 	gcc -c -pedantic -ansi -Wall -Iheader_files macro.c -o macro.o
