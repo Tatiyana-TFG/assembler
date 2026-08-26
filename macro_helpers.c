@@ -3,6 +3,11 @@
 #include <stdlib.h> 
 #include "macro_helpers.h"
 
+/*
+* Checks whether a source line exceeds the maximum allowed length
+* If the line is too long, consumes the remaining characters from fp
+* Returns 1 for an invalid line and 0 for a valid line
+*/
 int line_too_long(const char *line, FILE *fp) {
     int c;
     if (strchr(line, '\n') == NULL && (strlen(line) > 80)) 
@@ -13,7 +18,11 @@ int line_too_long(const char *line, FILE *fp) {
     }
     return 0; /*line valid*/
 }
-   
+
+/*
+* Searches the linked list of macros for name
+* Returns the matching macro node or NULL when the macro is not defined
+*/
 Macro *find_macro(Macro *head, char *name){ /* if found return pointer*/                                                                                                                     
         Macro *p = head;                                                                                                       
         while (p != NULL) {                                                                                                    
@@ -24,6 +33,11 @@ Macro *find_macro(Macro *head, char *name){ /* if found return pointer*/
         return NULL;               
     }
 
+/*
+* Allocates and initializes a macro node, then adds it to the macro table
+* Sets error to 1 if memory allocation fails
+* Returns the updated table head
+*/
 Macro *add_macro (Macro *head, char *name, int *error){
     Macro *new_mcro = malloc(sizeof(Macro));
     if (new_mcro== NULL){
@@ -39,6 +53,11 @@ Macro *add_macro (Macro *head, char *name, int *error){
     return head;
 }
 
+/*
+* Copies one source line into a macro's linked list
+* Lines are linked in reverse insertion order so they can later be printed
+* in their original source order
+*/
 void add_line (Macro *mcro, char *token, int *error){
     Line *new_line = malloc(sizeof (Line));
     if (new_line== NULL) {
@@ -57,6 +76,9 @@ void add_line (Macro *mcro, char *token, int *error){
       *error = 0;
   }
 
+/*
+* Writes all source lines stored in mcro to the output stream in source order
+*/
 void print_macro(Macro *mcro, FILE *out){
     Line *p = mcro->tail;
     while (p!= NULL){
@@ -65,20 +87,25 @@ void print_macro(Macro *mcro, FILE *out){
     }
 }
 
- void free_macros(Macro *mcro) {
-      while (mcro != NULL) {
-          Macro *next_mcro = mcro->next;
-          Line *p = mcro->tail;
-          while (p != NULL) {
-              Line *next_line = p->prev;
-              free(p);
-              p = next_line;
-          }
-          free(mcro);
-          mcro = next_mcro;
-      }
-  }
+/*Releases every macro node and every source-line node owned by the macro table*/
+void free_macros(Macro *mcro) {
+    while (mcro != NULL) {
+        Macro *next_mcro = mcro->next;
+        Line *p = mcro->tail;
+        while (p != NULL) {
+            Line *next_line = p->prev;
+            free(p);
+            p = next_line;
+        }
+        free(mcro);
+        mcro = next_mcro;
+    }
+}
   
+/*
+* Checks whether name is reserved for an instruction, directive, or macro
+* keyword. Returns 1 if reserved and 0 otherwise
+*/
 int is_reserved(char *name) /* 0 if not reserved 1 if reserved*/
 {
     static const char * forbiden_names[] = {

@@ -463,7 +463,7 @@ if (strcmp(token, ".db")==0){
     if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        success = encode_data(data_op_array, data_array_count, 1, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 1, data_image, DC, line_num);
         free(data_op_array);
         return success;
     }
@@ -474,7 +474,7 @@ if (strcmp(token, ".dh")==0){
     if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        success = encode_data(data_op_array, data_array_count, 2, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 2, data_image, DC,line_num);
         free(data_op_array);
         return success;
     }
@@ -485,7 +485,7 @@ if (strcmp(token, ".dw")==0){
    if (data_op_array == NULL){
         return 0;
     } else{ /*encode per db = 1 byte */
-        success = encode_data(data_op_array, data_array_count, 4, data_image, DC);
+        success = encode_data(data_op_array, data_array_count, 4, data_image, DC,line_num);
         free(data_op_array);
         return success;
     }
@@ -665,14 +665,14 @@ unsigned int encoder_j(int opcode, int reg_flag, int address){
     return inst_value;
 }
 
-int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC){ /* from MSB byte <- LSB to LSB byte <- MSB*/
+int encode_data(const long *data_op_array, int data_array_count, int num_of_bytes, unsigned char *data_image, int *DC, int line_num){ /* from MSB byte <- LSB to LSB byte <- MSB*/
     int byte_ind, i;
     unsigned long value;
     int required_bytes;
 
     required_bytes = data_array_count * num_of_bytes; /*image capacity check*/
     if (required_bytes > IMAGE_CAPACITY - (*DC)) {
-        printf("Error: Data image capacity is full\n");
+        printf("Error: Data image capacity is full in line %d\n", line_num);
         return 0;
     }
 
