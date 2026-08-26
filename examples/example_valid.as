@@ -1,0 +1,23 @@
+mcro LOAD_DONE
+la VALUE
+jmp DONE
+mcroend
+
+START: add $1,$2,$3
+addi $3,-10,$4
+LOAD_DONE
+DONE: hlt
+TEXT: .asciz "Assembler demo"
+VALUE: .dw -123456
+.entry START
+
+; Edge cases: whitespace, case-sensitive labels, maximum label length,
+; empty string, register jump, and forward/backward branches.
+CaseLabel: add   $1  ,   $2	, $3
+caselabel: addi $3 , -1 , $4
+JUMPTARGET: hlt
+beq $1,$1,JUMPTARGET
+jmp $31
+beq $1,$1,CaseLabel
+ABCDEFGHIJKLMNOPQRSTUVWXYZABCDE: .db -128, 255
+.asciz ""

@@ -126,7 +126,7 @@ while (fgets(line,MAX_LINE,in) != NULL){
                 }
 
                 if(!store_ic_value(encoded_val,IC,inst_image)){
-                    printf("Error: encodig error in line %d\n",line_num);
+                    printf("Error: Instruction image capacity is full in line %d\n", line_num);
                     error_flag ++;
                 }
                 break;
