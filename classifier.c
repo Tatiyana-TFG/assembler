@@ -7,6 +7,9 @@
 
 int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label definition with :*/
   int len;
+  char line_copy[MAX_LINE];
+  char *token;
+
   char *start =  *line; /*point to the same place line points to*/
   char *p= *line; /*point to the same place line points to*/
 
@@ -25,14 +28,21 @@ int is_label(char **line, char *name, Macro *mcro){ /*check if it is a label def
     memcpy(name,start,len); /*copy to name from start at length of len*/
     name [len] = '\0'; /*add terminator \0 at the end*/
 
-    if (valid_label(name,mcro)){ /*check if label is valid by other definitions*/
-      *line = p + 1; /*set line to point past the label for the rest of the check*/
-      return 1; /* label is good */
+    *line = p+1;
+    skip_whitespaces(line);
+  
+    strcpy (line_copy,*line); /* copy content to line copy*/
+    token = (strtok (line_copy, " \t \n")); /* get the  name after label*/
+    if (token != NULL && (strcmp(token, ".entry") == 0 || strcmp(token, ".extern") == 0)){ /* if entry ext*/
+      return 1; /* label validation is ignored if matched */
+  }
+
+  if (valid_label(name,mcro)){ /*check if label is valid by other definitions*/
+    return 1; /* label is good */
     } else 
     return -1; /*failed at the validity check*/
   
-  }
-  else 
+  } else 
   return 0; /* : exists but no label */
 }
 
