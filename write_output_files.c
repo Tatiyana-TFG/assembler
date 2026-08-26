@@ -147,3 +147,18 @@ FILE *out;
     }
     return 1;
 }
+void remove_output_files(const char *filename){ 
+/* function creates filenames.ob .ent .ext and deletes them*/
+char ob[MAX_FILENAME];
+char ent[MAX_FILENAME];
+char ext[MAX_FILENAME];
+int length = (int)strlen(filename);
+
+sprintf(ob,  "%.*s.ob",  length - 3, filename);
+sprintf(ent, "%.*s.ent", length - 3, filename);
+sprintf(ext, "%.*s.ext", length - 3, filename);
+
+remove(ob);
+remove(ent);
+remove(ext);
+}

@@ -65,7 +65,7 @@ int macro_expand(const char *src, const char *dst, Macro **mcro_head) {
                 free_macros(mcro);
                 return 0;
             }
-            
+
             if (is_reserved(token) == 1)  { /* check name is not reserved and illegal*/
                 printf("Error: macro name in line %d can't be a reserved name\n", line_num);
                 fclose(in);

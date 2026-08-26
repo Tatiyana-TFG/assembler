@@ -49,9 +49,12 @@ int main(int argc, char *argv[]) {
         sprintf(src, "%s", argv[i]);
         sprintf(am,  "%s", argv[i]);  /* am  = "prog.am" */
         am[name_length -1] = 'm'; /* change to .as -> .am*/
+        
         if (macro_expand(src, am, &mcro_head) == 0){ /* send src and pointer to dst */
             printf("Macro expension FAILED for %s\n", src);
             printf("========================================\n");
+            remove_output_files(src);
+            remove(am);
             had_error = 1;
             goto cleanup;
         }
@@ -62,6 +65,7 @@ int main(int argc, char *argv[]) {
         if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
             printf("First pass FAILED for %s\n", src);
             printf("========================================\n");
+            remove_output_files(src);
             had_error = 1;
             goto cleanup;
         }
@@ -71,6 +75,7 @@ int main(int argc, char *argv[]) {
         if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
             printf("Second pass FAILED for %s\n", src);
             printf("========================================\n");
+            remove_output_files(src);
             had_error = 1;
             goto cleanup;
         }
@@ -81,6 +86,7 @@ int main(int argc, char *argv[]) {
         if (write_output(src, IC ,DC ,inst_image, data_image, &symbols, &externs) == 0) {
             printf("Output writing FAILED for %s\n", src);
             printf("========================================\n");
+            remove_output_files(src);
             had_error = 1;
             goto cleanup;
         }
