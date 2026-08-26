@@ -205,7 +205,7 @@ return 1;
  */
 int check_end (char **p, int line_num){
     if (**p != '\n' && **p != '\0' ){
-        printf("Error: extra elements after the last register in line %d \n ", line_num);
+        printf("Error: extra elements after the last register in line %d\n ", line_num);
         return 0;
     }
     return 1;
@@ -229,7 +229,7 @@ int is_comma(char **p, int line_num){
         (*p)++;
         return 1;
     }
-    printf ("Error in line %d a comma is missing ", line_num);
+    printf ("Error: in line %d a comma is missing\n", line_num);
     return 0;
 }
 
