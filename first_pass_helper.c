@@ -592,8 +592,13 @@ if (*pp != '"'){
 pp++; /*if opening " exist - skip past it "*/
 string_start = pp;
 
-while (*pp != '"' && *pp != '\n' && *pp != '\0') /*skip all asciz chars*/
+while (*pp != '"' && *pp != '\n' && *pp != '\0'){/* check all are printable asciz chars and skip them*/
+    if ((unsigned char) *pp < 32 || (unsigned char) *pp > 126){      /* printable ASCII values*/
+        printf("Error: string containts non printable ASCII chars in line %d\n", line_num);
+        return 0;
+    }
     pp++;
+} 
 
 if (*pp != '"'){ /*closing char dosent exist*/
     printf("Error: missing closing quotes in line %d\n", line_num);
