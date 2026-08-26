@@ -257,12 +257,12 @@ int value = 0;
         (*p)++; /*move pointer past the digit*/
     }
     if (value > 31) {
-        printf ("Register number can't be bigger than 31 %d \n " , line_num); 
+        printf ("Register number can't be bigger than 31 %d\n " , line_num); 
         return 0;
     }
 
     if (**p >= '0' && **p <= '9'){
-        printf ("Register number can't be bigger than 31 %d \n ", line_num); 
+        printf ("Register number can't be bigger than 31 %d\n ", line_num); 
         return 0;  
     }
     *reg = value; /*keep value of register and pass back to caller*/
