@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "datatypes.h"
-#include "constatns.h"
+#include "constants.h"
 #include "first_pass_helper.h"
 #include "second_pass_helper.h"
 #include "write_output_files.h"

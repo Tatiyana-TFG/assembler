@@ -42,40 +42,57 @@ int main(int argc, char *argv[]) {
             goto cleanup;
         }
 
+        printf("\n========================================\n");
+        printf("Processing file: %s\n", argv[i]);
+        printf("========================================\n");
+
         sprintf(src, "%s", argv[i]);
         sprintf(am,  "%s", argv[i]);  /* am  = "prog.am" */
         am[name_length -1] = 'm'; /* change to .as -> .am*/
         if (macro_expand(src, am, &mcro_head) == 0){ /* send src and pointer to dst */
+            printf("Macro expension FAILED for %s\n", src);
+            printf("========================================\n");
+            had_error = 1;
+            goto cleanup;
+        }
+        printf("Macro expension SUCCEEDED for %s\n", src);
+        printf("========================================\n");
+
+
+        if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
+            printf("First pass FAILED for %s\n", src);
+            printf("========================================\n");
+            had_error = 1;
+            goto cleanup;
+        }
+        printf("First pass SUCCEEDED for %s\n", src);
+        printf("========================================\n");
+        
+        if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
+            printf("Second pass FAILED for %s\n", src);
+            printf("========================================\n");
+            had_error = 1;
+            goto cleanup;
+        }
+        printf("Second pass SUCCEEDED for %s\n", src);
+        printf("========================================\n");
+        
+
+        if (write_output(src, IC ,DC ,inst_image, data_image, &symbols, &externs) == 0) {
+            printf("Output writing FAILED for %s\n", src);
+            printf("========================================\n");
             had_error = 1;
             goto cleanup;
         }
 
-        if (first_pass(am,mcro_head,&IC,&DC, inst_image, data_image, &symbols) == 0){
-            had_error = 1;
-            goto cleanup;
-        }
-        
-        if (second_pass(am,mcro_head,inst_image,&symbols,&externs) ==0) {
-            had_error = 1;
-            goto cleanup;
-        }
-        
-        if (!write_output_files(argv[i], IC,DC,inst_image, data_image, &symbols, &externs)) {
-            had_error = 1;
-            goto cleanup;
-        }
-        if (write_output(src, IC ,DC ,inst_image, data_image, &symbols, &externs) == 0) {
-            had_error = 1;
-            goto cleanup;
-            
-        }
+    printf("Output writing SUCCEEDED for %s\n", src);
+    printf("========================================\n");
+
     cleanup:
         free_macros(mcro_head);
         free_externs(&externs);
         free_symbols(&symbols);
-} 
+} /* for loop */
+
 return had_error;
-/* for loop */
-
-
 }
