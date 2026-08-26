@@ -59,6 +59,7 @@ for (curr = symbols -> head; curr != NULL; curr = curr -> next){ /* check if ent
 }
 
 if (has_entry == 0) { /*if no entry exist dont create the file but return success*/
+    remove(filename); /* if in the second run we have the same filename but no entry - entry file must be deleted*/
     return 1;
 }
 /* open file and write entries*/
@@ -84,6 +85,7 @@ Extern_symbol *curr;
 FILE *out;
 
 if (externs -> head == NULL) {
+    remove(filename); /* if in second run file name is the same and exten is emtpy then file must not exist */
     return 1; /* no externs we return success*/
 }
 /*open file and write externs */
