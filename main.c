@@ -101,7 +101,6 @@ int main(int argc, char *argv[]) {
 
     printf("Output writing SUCCEEDED for %s\n", src);
     printf("========================================\n");
-    remove(am);
 
     cleanup:
         free_macros(mcro_head);
