@@ -27,8 +27,67 @@ int write_output (const char *filename, int IC,int DC, const unsigned int *inst_
     return 1;
 }
 
-int write_entry(const char *filename, const Symbol_table *symbols);
-int write_extern(const char *filename , const Extern_table *externs);
+int write_entry(const char *filename, const Symbol_table *symbols) {
+const Symbol *curr;
+int has_entry;
+FILE *out;
+
+has_entry = 0;
+for (curr = symbols -> head; curr != NULL; curr = curr -> next){ /* check if entry exists*/
+    if (curr -> is_ent) {
+        has_entry = 1;
+        break;
+    }
+}
+
+if (has_entry == 0) { /*if no entry exist dont create the file but return success*/
+    return 1;
+}
+/* open file and write entries*/
+out = fopen(filename,"w");
+if (out == NULL) {
+    printf("Error: could not create file  %s\n", filename);
+    return 0; 
+}
+
+for (curr = symbols -> head; curr != NULL; curr = curr -> next) {
+    if (curr -> is_ent) {
+        fprintf(out,"%s %04d\n", curr -> name, curr -> value); /* print ents*/
+    }
+}
+if (fclose(out) == EOF) /* error in closing the file*/
+    return 0;
+
+return 1; /*printed ents*/
+
+}
+
+
+int write_extern(const char *filename , const Extern_table *externs) {
+Extern_symbol *curr;
+FILE *out;
+
+if (externs -> head == NULL) {
+    return 1; /* no externs we return success*/
+}
+/*open file and write externs */
+out = fopen(filename,"w");
+
+if (out == NULL) {
+    printf("Error: could not create %s\n", filename);
+    return 0;
+}
+
+for (curr = externs -> head; curr != NULL; curr = curr -> next){ /*print when curr != null bc the list is only externs*/
+    fprintf(out, "%s %04d\n", curr -> name, curr -> address);
+}
+if (fclose(out) == EOF)
+    return 0;
+
+return 1;
+
+
+}
 
 int write_ob_file(const char *filename, int IC , int DC, const unsigned int inst_image[], const unsigned char data_image[]){
 int instruction_count;
@@ -37,14 +96,13 @@ unsigned int word;
 unsigned int byte;
 FILE *out;
 
-    
     out = fopen(filename, "w"); /*open filename.ob*/
     if (out == NULL) {
-        printf("Error: cannot open file %s", filename);
+        printf("Error: could not create file %s", filename);
         return 0;
     }
-    
-    instruction_count = (IC - 100)/4 ;
+
+    instruction_count = (IC - 100)/4 ; /*how many 4 bytes of instructions in the image*/
     fprintf(out, "%d %d\n", IC - 100, DC);
 
     /* loop through instructions and print IC value -> inside loop throguh each line*/
@@ -61,8 +119,15 @@ FILE *out;
     }
     /*print data image four bytes per line*/
 
-    for(i = 0; i< DC; i+=4);{
-        fprintf(out,"%04d", IC +i); /* printinf from */
+    for(i = 0; i< DC; i+=4){
+        fprintf(out,"%04d", IC +i); /* printinf from last IC address + size of first data */
+            for(j = 0; j < 4 && i +j < DC; j++) { /* Print at most four bytes without passing the end of the final data row */
+                fprintf(out," %02X", (unsigned int)data_image [i+j]);
+            }
+            fprintf(out,"\n");
+        }
+    if (fclose(out) == EOF) {
+        return 0; /*error*/
     }
-
+    return 1;
 }
