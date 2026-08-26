@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
             printf("First pass FAILED for %s\n", src);
             printf("========================================\n");
             remove_output_files(src);
+            remove(am);
             had_error = 1;
             goto cleanup;
         }
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]) {
             printf("Second pass FAILED for %s\n", src);
             printf("========================================\n");
             remove_output_files(src);
+            remove(am);
             had_error = 1;
             goto cleanup;
         }
@@ -92,6 +94,7 @@ int main(int argc, char *argv[]) {
             printf("Output writing FAILED for %s\n", src);
             printf("========================================\n");
             remove_output_files(src);
+            remove(am);
             had_error = 1;
             goto cleanup;
         }
@@ -100,6 +103,7 @@ int main(int argc, char *argv[]) {
     printf("========================================\n");
 
     cleanup:
+        remove(am);
         free_macros(mcro_head);
         free_externs(&externs);
         free_symbols(&symbols);
