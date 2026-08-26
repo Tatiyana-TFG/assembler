@@ -205,7 +205,7 @@ return 1;
  */
 int check_end (char **p, int line_num){
     if (**p != '\n' && **p != '\0' ){
-        printf("Error: extra elements after the last register in line %d\n ", line_num);
+        printf("Error: extra elements after the last register in line %d\n", line_num);
         return 0;
     }
     return 1;
@@ -257,12 +257,12 @@ int value = 0;
         (*p)++; /*move pointer past the digit*/
     }
     if (value > 31) {
-        printf ("Register number can't be bigger than 31 %d\n " , line_num); 
+        printf ("Register number can't be bigger than 31 in line %d\n" , line_num); 
         return 0;
     }
 
     if (**p >= '0' && **p <= '9'){
-        printf ("Register number can't be bigger than 31 %d\n ", line_num); 
+        printf ("Register number can't be bigger than 31 in line %d\n", line_num); 
         return 0;  
     }
     *reg = value; /*keep value of register and pass back to caller*/
