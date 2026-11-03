@@ -1,0 +1,16 @@
+# Build products from the makefile
+assembler
+*.o
+*.obj
+a.out
+
+# Written next to each .as input and removed or replaced on the next run
+*.am
+*.ob
+*.ent
+*.ext
+
+# Editor and OS files
+*~
+*.swp
+.DS_Store
