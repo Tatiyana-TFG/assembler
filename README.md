@@ -2,9 +2,9 @@
 
 [![Language](https://img.shields.io/badge/C-ANSI%20C90-blue.svg)](https://en.wikipedia.org/wiki/ANSI_C)
 
-A two-pass assembler in standard C for an imaginary 32-bit machine. This was my final project (**Maman 14**) for the Open University of Israel course **20465**, the systems programming lab, in semester 2026B. I scored 98.
+A two-pass assembler in standard C for an imaginary 32-bit machine. This was my final project (**Maman 14**) for the Open University of Israel course **20465**, the systems programming lab, in semester 2026B. I scored 98
 
-It translates assembly source into machine-code object files. It does not link, load, or run the program. The code uses only the C standard library — no external libraries.
+It translates assembly source into machine-code object files. It does not link, load, or run the program. The code uses only the C standard library with no external libraries
 
 ## What it does
 
