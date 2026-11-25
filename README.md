@@ -155,3 +155,5 @@ DONE: hlt
 ### Errors
 
 `tests/example_errors.as` collects illegal lines: a duplicate label, an out-of-range register, a missing operand, an unknown directive, and other malformed input. The assembler reports each problem with a line number. This repository does not include a saved copy of that console output. When a file fails, any `.am`, `.ob`, `.ent`, or `.ext` for that file is removed.
+
+Run make to compile. Build files are ignored by .gitignore.
